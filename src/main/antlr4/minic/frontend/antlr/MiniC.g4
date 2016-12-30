@@ -26,7 +26,7 @@ expression
     | IDENTIFIER
     | ('!' | '-') expression
     | expression ('*' | '/' | '%') expression
-    | expression ('+' | '-' | '%') expression
+    | expression ('+' | '-') expression
     | expression ('==' | '!=') expression
     | expression ('<' | '>' | '<=' || '>=') expression
     | expression ('&&') expression
