@@ -82,3 +82,21 @@ fragment HEX : [0-9a-fA-F] ;
 
 WS  :  [ \t\r\n\u000C]+ -> skip
     ;
+
+// tokens, needed to be able to be able to reference in visitor them via constants
+
+MUL : '*';
+DIV : '/';
+PLUS : '+';
+MINUS : '-';
+MOD : '%';
+LT : '<';
+GT : '>';
+LTEQ : '<=';
+GTEQ : '>=';
+ASSIGN : '=';
+EQ : '==';
+NOTEQ : '!=';
+NOT : '!';
+AND : '&&';
+OR : '||';
