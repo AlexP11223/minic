@@ -60,8 +60,8 @@ literal : IntegerLiteral
 
 // lexer rules (starting with uppercase)
 
-IntegerLiteral : '-'? DIGIT+;
-FloatingPointLiteral : '-'? DIGIT DIGIT* ('.' DIGIT DIGIT*)?;
+IntegerLiteral : DIGIT+;
+FloatingPointLiteral : DIGIT+ '.' DIGIT+;
 StringLiteral : '"' (ESC | ~["\\])* '"' ;
 BooleanLiteral : 'true' | 'false';
 
