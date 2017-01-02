@@ -65,8 +65,6 @@ FloatingPointLiteral : DIGIT+ '.' DIGIT+;
 StringLiteral : '"' (ESC | ~["\\])* '"' ;
 BooleanLiteral : 'true' | 'false';
 
-IDENTIFIER : (LETTER | '_') (LETTER | DIGIT | '_')* ;
-
 SEMI : ';';
 
 fragment
@@ -83,7 +81,19 @@ fragment HEX : [0-9a-fA-F] ;
 WS  :  [ \t\r\n\u000C]+ -> skip
     ;
 
-// tokens, needed to be able to be able to reference in visitor them via constants
+// tokens, needed to be able to be able to reference them via constants
+
+IF_KEYWORD: 'if';
+ELSE_KEYWORD: 'else';
+WHILE_KEYWORD: 'while';
+BREAK_KEYWORD: 'break';
+CONTINUE_KEYWORD: 'continue';
+EXIT_KEYWORD: 'exit';
+
+INT_TYPE: 'int';
+DOUBLE_TYPE: 'double';
+STRING_TYPE: 'string';
+BOOL_TYPE: 'bool';
 
 MUL : '*';
 DIV : '/';
@@ -100,3 +110,10 @@ NOTEQ : '!=';
 NOT : '!';
 AND : '&&';
 OR : '||';
+LPAR: '(';
+RPAR: ')';
+LBRACE: '{';
+RBRACE: '}';
+
+// must be last, otherwise some tokens like types, keywords may be incorrectly recognized as identifiers
+IDENTIFIER : (LETTER | '_') (LETTER | DIGIT | '_')* ;
