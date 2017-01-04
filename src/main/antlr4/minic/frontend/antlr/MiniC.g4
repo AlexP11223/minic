@@ -46,10 +46,10 @@ declaration : type IDENTIFIER (assignmentOp expression)? SEMI;
 
 assignmentOp : '=';
 
-type : 'int'
-     | 'double'
-     | 'bool'
-     | 'string'
+type : INT_TYPE
+     | DOUBLE_TYPE
+     | BOOL_TYPE
+     | STRING_TYPE
      ;
 
 literal : IntegerLiteral
