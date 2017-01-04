@@ -23,7 +23,7 @@ block
 
 expression
     : literal
-    | IDENTIFIER
+    | Identifier
     | ('!' | '-') expression
     | expression ('*' | '/' | '%') expression
     | expression ('+' | '-') expression
@@ -40,9 +40,9 @@ expression
 
 parExpression : '(' expression ')';
 
-assignment : IDENTIFIER assignmentOp expression SEMI;
+assignment : Identifier assignmentOp expression SEMI;
 
-declaration : type IDENTIFIER (assignmentOp expression)? SEMI;
+declaration : type Identifier (assignmentOp expression)? SEMI;
 
 assignmentOp : '=';
 
@@ -116,4 +116,4 @@ LBRACE: '{';
 RBRACE: '}';
 
 // must be last, otherwise some tokens like types, keywords may be incorrectly recognized as identifiers
-IDENTIFIER : (LETTER | '_') (LETTER | DIGIT | '_')* ;
+Identifier : (LETTER | '_') (LETTER | DIGIT | '_')* ;
