@@ -5,16 +5,16 @@ program
     ;
 
 statement
-    : block
-    | SEMI
-    | assignment
-    | declaration
-    | 'if' parExpression statement ('else' statement)?
-    | 'while' parExpression statement
-    | 'break' SEMI
-    | 'exit' SEMI
-    | 'print' parExpression SEMI
-    | 'println' parExpression SEMI
+    : block                                                 # blockStatement
+    | SEMI                                                  # emptyStatement
+    | assignment                                            # assignmentStatement
+    | declaration                                           # variableDeclarationStatement
+    | 'if' parExpression statement ('else' statement)?      # ifStatement
+    | 'while' parExpression statement                       # whileStatement
+    | 'break' SEMI                                          # breakStatement
+    | 'exit' SEMI                                           # exitStatement
+    | 'print' parExpression SEMI                            # printStatement
+    | 'println' parExpression SEMI                          # printlnStatement
     ;
 
 block
@@ -22,20 +22,20 @@ block
     ;
 
 expression
-    : literal
-    | Identifier
-    | ('!' | '-') expression
-    | expression ('*' | '/' | '%') expression
-    | expression ('+' | '-') expression
-    | expression ('==' | '!=') expression
-    | expression ('<' | '>' | '<=' || '>=') expression
-    | expression ('&&') expression
-    | expression ('||') expression
-    | parExpression
-    | 'readInt()'
-    | 'readDouble()'
-    | 'readLine()'
-    | 'toString' parExpression
+    : literal                                                           # literalExpression
+    | Identifier                                                        # variableReference
+    | op=('!' | '-') expression                                         # unaryOperation
+    | left=expression op=('*' | '/' | '%') right=expression             # binaryOperation
+    | left=expression op=('+' | '-') right=expression                   # binaryOperation
+    | left=expression op=('==' | '!=') right=expression                 # binaryOperation
+    | left=expression op=('<' | '>' | '<=' | '>=') right=expression     # binaryOperation
+    | left=expression op='&&' right=expression                          # binaryOperation
+    | left=expression op='||' right=expression                          # binaryOperation
+    | parExpression                                                     # parenthesesExpression
+    | 'readInt()'                                                       # readInt
+    | 'readDouble()'                                                    # readDouble
+    | 'readLine()'                                                      # readLine
+    | 'toString' parExpression                                          # toString
     ;
 
 parExpression : '(' expression ')';
@@ -46,16 +46,16 @@ declaration : type Identifier (assignmentOp expression)? SEMI;
 
 assignmentOp : '=';
 
-type : INT_TYPE
-     | DOUBLE_TYPE
-     | BOOL_TYPE
-     | STRING_TYPE
+type : INT_TYPE     # intType
+     | DOUBLE_TYPE  # doubleType
+     | BOOL_TYPE    # booleanType
+     | STRING_TYPE  # stringType
      ;
 
-literal : IntegerLiteral
-        | FloatingPointLiteral
-        | StringLiteral
-        | BooleanLiteral
+literal : IntegerLiteral        # int
+        | FloatingPointLiteral  # float
+        | StringLiteral         # string
+        | BooleanLiteral        # boolean
         ;
 
 // lexer rules (starting with uppercase)
