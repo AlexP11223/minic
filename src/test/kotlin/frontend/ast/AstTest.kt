@@ -143,7 +143,7 @@ int y = x;
 int y = 1.5 + x;"""
         val expectedAst = Program(listOf(
                 Assignment("x", IntLiteral(42, pos(1, 4, 1, 6)), pos(1, 0, 1, 7)),
-                VariableDeclaration(IntType(pos(2, 0, 2, 4)), "y",
+                VariableDeclaration(IntType(pos(2, 0, 2, 3)), "y",
                         AdditionExpression(
                                 FloatLiteral(1.5, pos(2, 8, 2, 11)),
                                 VariableReference("x", pos(2, 14, 2, 15)),
