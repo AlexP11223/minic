@@ -5,16 +5,16 @@ program
     ;
 
 statement
-    : block                                                 # blockStatement
-    | SEMI                                                  # emptyStatement
-    | assignment                                            # assignmentStatement
-    | declaration                                           # variableDeclarationStatement
-    | 'if' parExpression statement ('else' statement)?      # ifStatement
-    | 'while' parExpression statement                       # whileStatement
-    | 'break' SEMI                                          # breakStatement
-    | 'exit' SEMI                                           # exitStatement
-    | 'print' parExpression SEMI                            # printStatement
-    | 'println' parExpression SEMI                          # printlnStatement
+    : block                                                                 # blockStatement
+    | SEMI                                                                  # emptyStatement
+    | assignment                                                            # assignmentStatement
+    | declaration                                                           # variableDeclarationStatement
+    | 'if' parExpression ifBody=statement ('else' elseBody=statement)?      # ifStatement
+    | 'while' parExpression statement                                       # whileStatement
+    | 'break' SEMI                                                          # breakStatement
+    | 'exit' SEMI                                                           # exitStatement
+    | 'print' parExpression SEMI                                            # printStatement
+    | 'println' parExpression SEMI                                          # printlnStatement
     ;
 
 block
