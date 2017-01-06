@@ -137,6 +137,85 @@ int y = x;
     }
 
     @Test
+    fun parsesWhileStatement() {
+        val code =  """
+while (true) {
+    int i = 0;
+    break;
+}
+while (!flag)
+    x = x + 42;
+"""
+        val expectedAst = Program(listOf(
+                WhileStatement(BooleanLiteral(true),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                BreakStatement()
+                        ))),
+                WhileStatement(NotExpression(VariableReference("flag")),
+                        Assignment("x", AdditionExpression(VariableReference("x"), IntLiteral(42))))
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
+    fun parsesIfStatement() {
+        val code =  """
+if (flag1 && !flag2) {
+    string s = "Hello";
+    s2 = s + s2;
+}
+if (!flag)
+    x = x + 42;
+"""
+        val expectedAst = Program(listOf(
+                IfStatement(AndExpression(VariableReference("flag1"), NotExpression(VariableReference("flag2"))),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(StringType(), "s", StringLiteral("Hello")),
+                                Assignment("s2", AdditionExpression(VariableReference("s"), VariableReference("s2")))
+                        )), null),
+                IfStatement(NotExpression(VariableReference("flag")),
+                        Assignment("x", AdditionExpression(VariableReference("x"), IntLiteral(42))), null)
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
+    fun parsesIfElseStatement() {
+        val code =  """
+if (flag1 && !flag2) {
+    string s = "Hello";
+    s2 = s + s2;
+} else {
+    string s = "Hello1";
+    s2 = s + s2;
+}
+if (!flag)
+    x = x + 42;
+else
+    x = x - 42;
+"""
+        val expectedAst = Program(listOf(
+                IfStatement(AndExpression(VariableReference("flag1"), NotExpression(VariableReference("flag2"))),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(StringType(), "s", StringLiteral("Hello")),
+                                Assignment("s2", AdditionExpression(VariableReference("s"), VariableReference("s2")))
+                        )),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(StringType(), "s", StringLiteral("Hello1")),
+                                Assignment("s2", AdditionExpression(VariableReference("s"), VariableReference("s2")))
+                        ))),
+                IfStatement(NotExpression(VariableReference("flag")),
+                        Assignment("x", AdditionExpression(VariableReference("x"), IntLiteral(42))),
+                        Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42))))
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
     fun parsesWithPosition() {
         val code =
 """x = 42;

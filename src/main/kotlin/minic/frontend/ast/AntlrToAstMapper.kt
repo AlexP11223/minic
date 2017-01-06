@@ -23,6 +23,10 @@ class AntlrToAstMapper(val setPosition: Boolean = true) {
     fun ProgramContext.toAst() : Program = Program(this.statement().map { it.toAst() }, position())
 
     fun StatementContext.toAst(): Statement = when (this) {
+        is BlockStatementContext -> StatementsBlock(block().statement().map { it.toAst() }, position())
+        is IfStatementContext -> IfStatement(parExpression().expression().toAst(), ifBody.toAst(), elseBody?.toAst(), position())
+        is WhileStatementContext -> WhileStatement(parExpression().expression().toAst(), statement().toAst(), position())
+        is BreakStatementContext -> BreakStatement(position())
         is VariableDeclarationStatementContext -> VariableDeclaration(declaration().type().toAst(), declaration().Identifier().text, declaration().expression().toAst(), position())
         is AssignmentStatementContext -> Assignment(assignment().Identifier().text, assignment().expression().toAst(), position())
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)

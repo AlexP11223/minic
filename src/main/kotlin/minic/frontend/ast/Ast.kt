@@ -11,6 +11,20 @@ data class Program(val statements: List<Statement>, override val position: Posit
 
 interface Statement : AstNode
 
+data class StatementsBlock(val statements: List<Statement>, override val position: Position? = null) : Statement {
+    override fun children(): List<AstNode> = statements
+}
+
+data class IfStatement(val expr: Expression, val ifBody: Statement, val elseBody: Statement?, override val position: Position? = null) : Statement {
+    override fun children(): List<AstNode> = listOf(expr, ifBody, elseBody).filterNotNull()
+}
+
+data class WhileStatement(val expr: Expression, val statement: Statement, override val position: Position? = null) : Statement {
+    override fun children(): List<AstNode> = listOf(expr, statement)
+}
+
+data class BreakStatement(override val position: Position? = null) : Statement
+
 data class VariableDeclaration(val variableType: Type, val variableName: String, val value: Expression, override val position: Position? = null) : Statement {
     override fun children(): List<AstNode> = listOf(value)
 }
