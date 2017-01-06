@@ -8,7 +8,7 @@ import org.antlr.v4.runtime.Token
 // ANTLR parse tree mapping to AST
 
 fun Token.startPoint() = Point(line, charPositionInLine)
-fun Token.endPoint() = Point(line, charPositionInLine + text.length)
+fun Token.endPoint() = Point(line, charPositionInLine + (if (type != MiniCLexer.EOF) text.length else 0))
 
 class AntlrToAstMapper(val setPosition: Boolean = true) {
 

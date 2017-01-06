@@ -149,9 +149,10 @@ int y = 1.5 + x;"""
                                 VariableReference("x", pos(2, 14, 2, 15)),
                                 pos(2, 8, 2, 15)
                         ), pos(2, 0, 2, 16))
-        ), pos(1, 0, 2, 17))
+        ), pos(1, 0, 2, 16))
 
-        assertEquals(expectedAst, ast(code, setPosition = true))
+        val ast = ast(code, setPosition = true)
+        assertEquals(expectedAst, ast)
     }
 
 }
