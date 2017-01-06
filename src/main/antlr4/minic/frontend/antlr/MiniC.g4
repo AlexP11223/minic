@@ -27,8 +27,8 @@ expression
     | op=('!' | '-') expression                                         # unaryOperation
     | left=expression op=('*' | '/' | '%') right=expression             # binaryOperation
     | left=expression op=('+' | '-') right=expression                   # binaryOperation
-    | left=expression op=('==' | '!=') right=expression                 # binaryOperation
     | left=expression op=('<' | '>' | '<=' | '>=') right=expression     # binaryOperation
+    | left=expression op=('==' | '!=') right=expression                 # binaryOperation
     | left=expression op='&&' right=expression                          # binaryOperation
     | left=expression op='||' right=expression                          # binaryOperation
     | parExpression                                                     # parenthesesExpression
