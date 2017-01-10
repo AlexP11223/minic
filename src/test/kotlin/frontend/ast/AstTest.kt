@@ -1,21 +1,20 @@
 package frontend.ast
 
-import minic.frontend.antlr.MiniCLexer
-import minic.frontend.antlr.MiniCParser
+import minic.Compiler
 import minic.frontend.ast.*
-import org.antlr.v4.runtime.ANTLRInputStream
-import org.antlr.v4.runtime.CommonTokenStream
 import org.junit.Test
-import java.io.StringReader
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class AstTest {
     fun pos(startLine: Int, startCol: Int, endLine: Int, endCol: Int) = Position(Point(startLine,startCol), Point(endLine,endCol))
 
     fun ast(code: String, setPosition: Boolean = false): Program {
-        val lexer = MiniCLexer(ANTLRInputStream(StringReader(code)))
-        val parser = MiniCParser(CommonTokenStream(lexer))
-        val antlrTree = parser.program()
+        val parsingResult = Compiler(diagnosticChecks = true).parse(code)
+
+        assertTrue(parsingResult.errors.isEmpty(), "Parsng errors\n" + parsingResult.errors)
+
+        val antlrTree = parsingResult.root
 
         val mapper = AntlrToAstMapper(setPosition)
         val ast = mapper.map(antlrTree)
