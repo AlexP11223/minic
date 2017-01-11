@@ -212,6 +212,52 @@ else
         ))
 
         assertEquals(expectedAst, ast(code))
+
+    @Test
+    fun parsesNestedIfElseStatement() {
+        val code =  """
+if (flag1)
+    x = 42;
+else if (flag2)
+    x = 43;
+else
+    x = 44;
+
+if (flag1)
+    if (flag2)
+        x = 42;
+    else
+        x = 43;
+
+if (flag1)
+    if (flag2)
+        x = 42;
+    else
+        x = 43;
+else
+    x = 44;
+"""
+        val expectedAst = Program(listOf(
+                IfStatement(VariableReference("flag1"),
+                        Assignment("x", IntLiteral(42)),
+                        IfStatement(VariableReference("flag2"),
+                                Assignment("x", IntLiteral(43)),
+                                Assignment("x", IntLiteral(44)))),
+
+                IfStatement(VariableReference("flag1"),
+                        IfStatement(VariableReference("flag2"),
+                                Assignment("x", IntLiteral(42)),
+                                Assignment("x", IntLiteral(43))),
+                        null),
+
+                IfStatement(VariableReference("flag1"),
+                        IfStatement(VariableReference("flag2"),
+                                Assignment("x", IntLiteral(42)),
+                                Assignment("x", IntLiteral(43))),
+                        Assignment("x", IntLiteral(44)))
+        ))
+
+        assertEquals(expectedAst, ast(code))
     }
 
     @Test
