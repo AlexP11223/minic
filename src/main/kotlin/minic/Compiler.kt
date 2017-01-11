@@ -8,6 +8,7 @@ import minic.frontend.ast.Program
 import minic.frontend.validation.Error
 import minic.frontend.validation.validate
 import org.antlr.v4.runtime.*
+import org.antlr.v4.runtime.atn.PredictionMode
 import java.io.InputStream
 import java.util.*
 
@@ -38,6 +39,7 @@ class Compiler(val diagnosticChecks: Boolean = false) {
         parser.removeErrorListeners(); // remove ConsoleErrorListener
         parser.addErrorListener(errorListener)
         if (diagnosticChecks) {
+            parser.interpreter.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION
             parser.addErrorListener(DiagnosticErrorListener())
         }
 
