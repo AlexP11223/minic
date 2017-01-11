@@ -105,6 +105,34 @@ class AstNodeTest {
     }
 
     @Test
+    fun canProcessSpecificNodeMultipleTypes() {
+        val ast = Program(listOf(
+                WhileStatement(BooleanLiteral(true),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                BreakStatement()
+                        ))),
+                IfStatement(NotExpression(VariableReference("flag")),
+                        Assignment("x", AdditionExpression(VariableReference("x"), IntLiteral(42))),
+                        Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42)))),
+                VariableDeclaration(StringType(), "s", StringLiteral("Hello"))
+        ))
+
+        val result = mutableListOf<String>()
+
+        ast.process(listOf(VariableDeclaration::class.java, BinaryExpression::class.java)) {
+            result.add(it.javaClass.simpleName)
+        }
+
+        assertEquals(listOf(
+                "VariableDeclaration",
+                "AdditionExpression",
+                "SubtractionExpression",
+                "VariableDeclaration"
+        ), result)
+    }
+
+    @Test
     fun canProcessUntil() {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),

@@ -23,6 +23,14 @@ interface AstNode {
         }
     }
 
+    fun process(nodeClasses: List<Class<out AstNode>>, operation: (AstNode) -> Unit) {
+        process { node ->
+            if (nodeClasses.any { it.isInstance(node) }) {
+                operation(node)
+            }
+        }
+    }
+
     fun processUntil(operation: (AstNode) -> Boolean) {
         if (operation(this)) {
             children().forEach {
