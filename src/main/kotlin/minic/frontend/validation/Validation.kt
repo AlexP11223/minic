@@ -1,12 +1,18 @@
 package minic.frontend.validation
 
-import minic.frontend.ast.AstNode
-import minic.frontend.ast.BreakStatement
-import minic.frontend.ast.Program
-import minic.frontend.ast.WhileStatement
+import minic.frontend.ast.*
 
 fun Program.validate() : List<Error> {
     val errors = mutableListOf<Error>()
+
+    // don't allow variable declarations in if/while without block
+    this.process(listOf(WhileStatement::class.java, IfStatement::class.java)) {
+        it.children().forEach {
+            if (it is VariableDeclaration) {
+                errors.add(Error("Variable declaration not allowed here", it.position!!.start))
+            }
+        }
+    }
 
     // check break statements
     this.processUntil(fun(it: AstNode): Boolean {

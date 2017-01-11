@@ -28,10 +28,48 @@ if (true) {
 }
 """.trim()
 
-        assertEquals(listOf(
+        val expectedErrors = listOf(
                 Error("Unexpected break statement", Point(1, 0)),
                 Error("Unexpected break statement", Point(8, 4)),
                 Error("Unexpected break statement", Point(10, 4))
-                ), validate(code))
+        )
+
+        assertEquals(expectedErrors, validate(code))
+    }
+
+    @Test
+    fun dontAllowVarDeclarationInNonBlockIfWhile() {
+        val code = """
+int a = 42;
+while (true)
+    int b = 42;
+while (true) {
+    int c = 42;
+    if (true)
+        double d = 42.0;
+    else
+        string e = "42";
+}
+if (true)
+    bool f = true;
+else
+    int g = 42;
+if (true) {
+    int h = 42;
+} else {
+    int i = 42;
+}
+""".trim()
+
+        val expectedErrors = listOf(
+                Error("Variable declaration not allowed here", Point(3, 4)),
+                Error("Variable declaration not allowed here", Point(7, 8)),
+                Error("Variable declaration not allowed here", Point(9, 8)),
+                Error("Variable declaration not allowed here", Point(12, 4)),
+                Error("Variable declaration not allowed here", Point(14, 4))
+        )
+
+        // disabled ambiguity checks (dangling else)
+        assertEquals(expectedErrors, validate(code, diagnosticChecks = false))
     }
 }
