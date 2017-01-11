@@ -8,10 +8,26 @@ interface AstNode {
     fun children() : List<AstNode> = listOf()
 
     fun process(operation: (AstNode) -> Unit) {
-        operation(this);
+        operation(this)
 
         children().forEach {
             it.process(operation)
+        }
+    }
+
+    fun <T: AstNode> process(nodeClass: Class<T>, operation: (T) -> Unit) {
+        process {
+            if (nodeClass.isInstance(it)) {
+                operation(it as T)
+            }
+        }
+    }
+
+    fun processUntil(operation: (AstNode) -> Boolean) {
+        if (operation(this)) {
+            children().forEach {
+                it.processUntil(operation)
+            }
         }
     }
 }

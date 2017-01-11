@@ -26,7 +26,7 @@ data class WhileStatement(val expr: Expression, val statement: Statement, overri
 data class BreakStatement(override val position: Position? = null) : Statement
 
 data class VariableDeclaration(val variableType: Type, val variableName: String, val value: Expression, override val position: Position? = null) : Statement {
-    override fun children(): List<AstNode> = listOf(value)
+    override fun children(): List<AstNode> = listOf(variableType, value)
 }
 
 data class Assignment(val variableName: String, val value: Expression, override val position: Position? = null) : Statement {
