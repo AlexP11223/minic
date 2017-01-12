@@ -5,11 +5,24 @@ import minic.frontend.ast.Point
 import minic.frontend.validation.Error
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ValidationTest {
 
     fun validate(code: String, diagnosticChecks: Boolean = true): List<Error> {
         return Compiler(diagnosticChecks).validate(code)
+    }
+
+    @Test
+    fun reportsSyntaxErrors() {
+        val code = """
+qwe;
+abc/
+""".trim()
+
+        val errors = validate(code)
+
+        assertTrue(errors.count() >= 2)
     }
 
     @Test
