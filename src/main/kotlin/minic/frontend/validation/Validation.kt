@@ -23,5 +23,5 @@ fun Program.validate() : List<Error> {
         return true
     })
 
-    return errors
+    return errors.sortedBy { it.position }
 }
