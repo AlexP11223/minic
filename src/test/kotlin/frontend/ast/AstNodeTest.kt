@@ -164,4 +164,75 @@ class AstNodeTest {
                 "IntLiteral"
         ), result)
     }
+
+    @Test
+    fun canProcessEnterExit() {
+        val ast = Program(listOf(
+                WhileStatement(BooleanLiteral(true),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                BreakStatement()
+                        )))
+        ))
+
+        val result = mutableListOf<String>()
+
+        ast.process(enterOperation = {
+            result.add("Enter " + it.javaClass.simpleName)
+        }, exitOperation = {
+            result.add("Exit " + it.javaClass.simpleName)
+        })
+
+        assertEquals(listOf(
+                "Enter Program",
+                "Enter WhileStatement",
+                "Enter BooleanLiteral",
+                "Exit BooleanLiteral",
+                "Enter StatementsBlock",
+                "Enter VariableDeclaration",
+                "Enter IntType",
+                "Exit IntType",
+                "Enter IntLiteral",
+                "Exit IntLiteral",
+                "Exit VariableDeclaration",
+                "Enter BreakStatement",
+                "Exit BreakStatement",
+                "Exit StatementsBlock",
+                "Exit WhileStatement",
+                "Exit Program"
+        ), result)
+    }
+
+    @Test
+    fun canProcessEnterExitSpecificNodeType() {
+        val ast = Program(listOf(
+                WhileStatement(BooleanLiteral(true),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                BreakStatement(),
+                                IfStatement(NotExpression(VariableReference("flag")),
+                                        StatementsBlock(listOf()),
+                                        StatementsBlock(listOf(
+                                                Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42))))
+                                        ))
+                        )))
+        ))
+
+        val result = mutableListOf<String>()
+
+        ast.process(StatementsBlock::class.java, enterOperation = {
+            result.add("Enter " + it.javaClass.simpleName + " ${it.statements.count()} statements")
+        }, exitOperation = {
+            result.add("Exit " + it.javaClass.simpleName + " ${it.statements.count()} statements")
+        })
+
+        assertEquals(listOf(
+                "Enter StatementsBlock 3 statements",
+                "Enter StatementsBlock 0 statements",
+                "Exit StatementsBlock 0 statements",
+                "Enter StatementsBlock 1 statements",
+                "Exit StatementsBlock 1 statements",
+                "Exit StatementsBlock 3 statements"
+        ), result)
+    }
 }

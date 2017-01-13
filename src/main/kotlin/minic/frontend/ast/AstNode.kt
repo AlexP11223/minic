@@ -7,21 +7,31 @@ interface AstNode {
     // no children by default
     fun children() : List<AstNode> = listOf()
 
-    fun process(operation: (AstNode) -> Unit) {
-        operation(this)
+    fun process(enterOperation: (AstNode) -> Unit, exitOperation: (AstNode) -> Unit) {
+        enterOperation(this)
 
         children().forEach {
-            it.process(operation)
+            it.process(enterOperation, exitOperation)
         }
+
+        exitOperation(this)
     }
 
-    fun <T: AstNode> process(nodeClass: Class<T>, operation: (T) -> Unit) {
-        process {
+    fun <T: AstNode> process(nodeClass: Class<T>, enterOperation: (T) -> Unit, exitOperation: (T) -> Unit) {
+        process(enterOperation = {
             if (nodeClass.isInstance(it)) {
-                operation(it as T)
+                enterOperation(it as T)
             }
-        }
+        }, exitOperation = {
+            if (nodeClass.isInstance(it)) {
+                exitOperation(it as T)
+            }
+        })
     }
+
+    fun process(operation: (AstNode) -> Unit) = process(enterOperation = operation, exitOperation = { })
+
+    fun <T: AstNode> process(nodeClass: Class<T>, operation: (T) -> Unit) = process(nodeClass, enterOperation = operation, exitOperation = { })
 
     fun process(nodeClasses: List<Class<out AstNode>>, operation: (AstNode) -> Unit) {
         process { node ->
