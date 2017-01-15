@@ -161,6 +161,80 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Create .exe -->
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.7.15</version>
+                <executions>
+                    <execution>
+                        <id>l4j</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>console</headerType>
+                            <outfile>${project.basedir}/target/${project.build.finalName}.exe</outfile>
+                            <jar>${project.basedir}/target/${project.build.finalName}.jar</jar>
+                            <dontWrapJar>false</dontWrapJar>
+                            <errTitle>${project.build.finalName}</errTitle>
+                            <classPath>
+                                <mainClass>minic.MainKt</mainClass>
+                            </classPath>
+                            <jre>
+                                <minVersion>1.8.0</minVersion>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>1.0.0.0</txtFileVersion>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <fileDescription>Mini-C compiler</fileDescription>
+                                <copyright>Copyright (c) 2017</copyright>
+                                <productName>${project.build.finalName}</productName>
+                                <internalName>${project.build.finalName}</internalName>
+                                <originalFilename>${project.build.finalName}.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Create directory (dist/) and zip archive with jar, exe, launch script, sample source code -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>maven-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.basedir}/dist</outputDirectory>
+                    <descriptors>
+                        <descriptor>${project.basedir}/src/main/maven-assembly/dist.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+
+            <!-- Delete dist/ when running the clean phase -->
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.basedir}/dist</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

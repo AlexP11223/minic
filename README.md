@@ -18,7 +18,7 @@ Run Maven `package` goal. This will download all dependencies, run JUnit tests a
  
 #Usage
  
- 1. `cd dist`
+ 1. `cd dist/minic-dist`
  2. Run via `java -jar minic.jar <parameters>` or `minic  <parameters>` (via shell script or Windows .exe).
  
 If launched without parameters, it reads input from stdin until EOF (Ctrl+D, or Ctrl+Z for Windows), compiles and runs the program.
