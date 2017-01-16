@@ -58,32 +58,4 @@ class ScopeTest {
         assertEquals(null, globalScope.resolve("y"))
         assertEquals(null, localScope1.resolve("z"))
     }
-
-    @Test
-    fun equalsWorks() {
-        val globalScope = GlobalScope()
-
-        val scope1 = LocalScope(globalScope)
-        scope1.define(VariableSymbol("i", IntType()))
-        scope1.define(VariableSymbol("str", StringType()))
-
-        val scope2 = LocalScope(globalScope)
-        scope2.define(VariableSymbol("i", IntType()))
-        scope2.define(VariableSymbol("str", StringType()))
-
-        val scope3 = LocalScope(globalScope)
-        scope3.define(VariableSymbol("i", IntType()))
-        scope3.define(VariableSymbol("j", IntType()))
-
-        val scope4 = LocalScope(scope1)
-        scope4.define(VariableSymbol("i", IntType()))
-        scope4.define(VariableSymbol("str", StringType()))
-
-        assertFalse(scope1.equals(globalScope))
-
-        assertEquals(scope1, scope2)
-        assertNotEquals(scope1, scope3)
-
-        assertNotEquals(scope1, scope4)
-    }
 }

@@ -39,16 +39,6 @@ abstract class BaseScope() : Scope {
     }
 
     override fun toString() = "symbols=$symbols"
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-
-        other as BaseScope
-        return symbols == other.symbols && parent == other.parent
-    }
-
-    override fun hashCode() = symbols.hashCode() * 31 + (parent?.hashCode() ?: 0)
 }
 
 class GlobalScope() : BaseScope() {
