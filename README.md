@@ -14,16 +14,20 @@ Run Maven `package` goal. This will download all dependencies, run JUnit tests a
 
 (Maven is included in popular Java IDEs such as IntelliJ Idea or Eclipse. You can run it either via your IDE Maven plugin or from command line for separate [Maven installation](https://maven.apache.org/install.html): `mvn package`.)
 
-`dist/` folder will contain JAR file, .exe for Windows and shell for Linux/MacOS (it simply executes the JAR file via `java`)
+`dist/` folder will contain JAR file, .exe for Windows and shell script for Linux/MacOS (it simply executes the JAR file via `java`)
  
 #Usage
  
  1. `cd dist/minic-dist`
- 2. Run via `java -jar minic.jar <parameters>` or `minic  <parameters>` (via shell script or Windows .exe).
+ 2. Run `minic  <parameters>` (via shell script or Windows .exe) or `java -jar minic.jar <parameters>`.
  
 If launched without parameters, it reads input from stdin until EOF (Ctrl+D, or Ctrl+Z for Windows), compiles and runs the program.
  
-Is it possible to specify input and output files: `minic input_file [output_file]`.
+Also it is possible to specify input and output files: 
+
+```
+minic input_file [output_file]
+```
 
 **input_file** is path (or name) of file with Mini-C source code.
 
@@ -40,5 +44,5 @@ minic MyProgram.mc MyProgram
 ```
 and
 ```
-java -jar MyProgram
+java MyProgram
 ```
