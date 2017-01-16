@@ -1,4 +1,4 @@
-package frontend.validation
+package minic.frontend.validation
 
 import minic.Compiler
 import minic.frontend.ast.Point

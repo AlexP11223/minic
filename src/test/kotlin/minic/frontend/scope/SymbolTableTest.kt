@@ -1,4 +1,4 @@
-package frontend.scope
+package minic.frontend.scope
 
 import minic.frontend.ast.*
 import minic.frontend.scope.*

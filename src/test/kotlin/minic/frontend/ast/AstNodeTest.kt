@@ -1,4 +1,4 @@
-package frontend.ast
+package minic.frontend.ast
 
 import minic.frontend.ast.*
 import org.junit.Test

@@ -1,4 +1,4 @@
-package frontend.ast
+package minic.frontend.ast
 
 import minic.Compiler
 import minic.frontend.ast.*

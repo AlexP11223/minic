@@ -1,4 +1,4 @@
-package frontend.antlr
+package minic.frontend.antlr
 
 import com.tngtech.java.junit.dataprovider.DataProvider
 import com.tngtech.java.junit.dataprovider.DataProviderRunner
