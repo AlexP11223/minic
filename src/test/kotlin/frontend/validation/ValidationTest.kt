@@ -85,4 +85,61 @@ if (true) {
         // disabled ambiguity checks (dangling else)
         assertEquals(expectedErrors, validate(code, diagnosticChecks = false))
     }
+
+    @Test
+    fun detectUndeclaredVariables() {
+        val code = """
+a = 42;
+while (true)
+    b = 42;
+while (true) {
+    if (true)
+        c = 42.0;
+    else {
+        string d = e;
+    }
+}
+f = g + h;
+""".trim()
+
+        val expectedErrors = listOf(
+                Error("Variable 'a' is not declared", Point(1, 0)),
+                Error("Variable 'b' is not declared", Point(3, 4)),
+                Error("Variable 'c' is not declared", Point(6, 8)),
+                Error("Variable 'e' is not declared", Point(8, 19)),
+                Error("Variable 'f' is not declared", Point(11, 0)),
+                Error("Variable 'g' is not declared", Point(11, 4)),
+                Error("Variable 'h' is not declared", Point(11, 8))
+        )
+
+        // disabled ambiguity checks (dangling else)
+        assertEquals(expectedErrors, validate(code, diagnosticChecks = false))
+    }
+
+    @Test
+    fun detectRedeclaredVariables() {
+        val code = """
+int a = 42;
+int a = 43;
+while (true) {
+    bool a = true;
+    if (true) {
+        double a = 42.0;
+    }
+    else {
+        string a = "Hello";
+    }
+}
+""".trim()
+
+        val expectedErrors = listOf(
+                Error("Variable 'a' is already declared", Point(2, 0)),
+                Error("Variable 'a' is already declared", Point(4, 4)),
+                Error("Variable 'a' is already declared", Point(6, 8)),
+                Error("Variable 'a' is already declared", Point(9, 8))
+        )
+
+        // disabled ambiguity checks (dangling else)
+        assertEquals(expectedErrors, validate(code, diagnosticChecks = false))
+    }
 }
