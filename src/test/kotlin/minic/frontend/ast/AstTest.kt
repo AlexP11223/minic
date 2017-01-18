@@ -56,7 +56,7 @@ int y = x;
                 VariableDeclaration(IntType(), "x", IntLiteral(42)),
                 VariableDeclaration(DoubleType(), "xf", FloatLiteral(42.5)),
                 VariableDeclaration(StringType(), "xs", StringLiteral("Hello")),
-                VariableDeclaration(BooleanType(), "xb", BooleanLiteral(true)),
+                VariableDeclaration(BoolType(), "xb", BooleanLiteral(true)),
                 VariableDeclaration(IntType(), "y", VariableReference("x"))
         ))
 

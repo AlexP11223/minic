@@ -37,12 +37,15 @@ data class Assignment(val variableName: String, val value: Expression, override 
 // Types
 //
 
-interface Type : AstNode
+interface Type : AstNode {
+    val name: String
+        get() = javaClass.simpleName.removeSuffix("Type").toLowerCase()
+}
 
 data class IntType(override val position: Position? = null) : Type
 data class DoubleType(override val position: Position? = null) : Type
 data class StringType(override val position: Position? = null) : Type
-data class BooleanType(override val position: Position? = null) : Type
+data class BoolType(override val position: Position? = null) : Type
 
 //
 // Expressions

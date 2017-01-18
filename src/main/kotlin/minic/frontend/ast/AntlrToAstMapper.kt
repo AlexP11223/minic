@@ -78,7 +78,7 @@ class AntlrToAstMapper(val setPosition: Boolean = true) {
     fun TypeContext.toAst(): Type = when (this) {
         is IntTypeContext -> IntType(position())
         is DoubleTypeContext -> DoubleType(position())
-        is BooleanTypeContext -> BooleanType(position())
+        is BooleanTypeContext -> BoolType(position())
         is StringTypeContext -> StringType(position())
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
