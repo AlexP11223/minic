@@ -264,6 +264,39 @@ else
     }
 
     @Test
+    fun parsesComparisonExpressions() {
+        val code =  """
+if (a == 42 && b > 1 && c < 0 && d >= 10.5 && -1 <= e && str != "Hello") {
+    f = x != 42;
+}
+"""
+        val expectedAst = Program(listOf(
+                IfStatement(
+                        AndExpression(
+                                AndExpression(
+                                        AndExpression(
+                                                AndExpression(
+                                                        AndExpression(
+                                                                EqualExpression(VariableReference("a"), IntLiteral(42)),
+                                                                GreaterExpression(VariableReference("b"), IntLiteral(1))
+                                                        ),
+                                                        LessExpression(VariableReference("c"), IntLiteral(0))
+                                                ),
+                                                GreaterOrEqualExpression(VariableReference("d"), FloatLiteral(10.5))
+                                        ),
+                                        LessOrEqualExpression(UnaryMinusExpression(IntLiteral(1)), VariableReference("e"))
+                                ),
+                                NotEqualExpression(VariableReference("str"), StringLiteral("Hello"))
+                        ),
+                        StatementsBlock(listOf(
+                                Assignment("f", NotEqualExpression(VariableReference("x"), IntLiteral(42)))
+                        )), null)
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
     fun parsesWithPosition() {
         val code =
 """x = 42;

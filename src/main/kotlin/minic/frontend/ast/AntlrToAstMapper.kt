@@ -65,6 +65,13 @@ class AntlrToAstMapper(val setPosition: Boolean = true) {
         MiniCLexer.AND -> AndExpression(left.toAst(), right.toAst(), position())
         MiniCLexer.OR -> OrExpression(left.toAst(), right.toAst(), position())
 
+        MiniCLexer.EQ -> EqualExpression(left.toAst(), right.toAst(), position())
+        MiniCLexer.NOTEQ -> NotEqualExpression(left.toAst(), right.toAst(), position())
+        MiniCLexer.LT -> LessExpression(left.toAst(), right.toAst(), position())
+        MiniCLexer.GT -> GreaterExpression(left.toAst(), right.toAst(), position())
+        MiniCLexer.LTEQ -> LessOrEqualExpression(left.toAst(), right.toAst(), position())
+        MiniCLexer.GTEQ -> GreaterOrEqualExpression(left.toAst(), right.toAst(), position())
+
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 

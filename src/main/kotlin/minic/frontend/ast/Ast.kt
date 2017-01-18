@@ -80,3 +80,12 @@ data class NotExpression(val expr: Expression, override val position: Position? 
 
 data class AndExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, LogicalExpression
 data class OrExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, LogicalExpression
+
+interface ComparisonExpression : Expression
+
+data class EqualExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, ComparisonExpression
+data class NotEqualExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, ComparisonExpression
+data class LessExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, ComparisonExpression
+data class GreaterExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, ComparisonExpression
+data class LessOrEqualExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, ComparisonExpression
+data class GreaterOrEqualExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, ComparisonExpression
