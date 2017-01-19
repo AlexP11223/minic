@@ -9,17 +9,17 @@ class SymbolTableTest {
 
     private fun symbolsStr(scope: Scope): String {
         return scope.allSymbols()
-                .map { it.type.javaClass.simpleName.toLowerCase().replace("type", "") + " " + it.name }
+                .map { it.type.name + " " + it.name }
                 .joinToString(", ")
     }
 
     @Test
     fun canProcessWithSymbols() {
         val ast = Program(listOf(
-                VariableDeclaration(StringType(), "str", StringLiteral("Hello")),
+                VariableDeclaration(StringTypeNode(), "str", StringLiteral("Hello")),
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0))
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0))
                         )))
         ))
 
@@ -38,9 +38,9 @@ class SymbolTableTest {
                 "Enter Program",
                 "BeforeSymbol VariableDeclaration",
                 "Enter VariableDeclaration: string str",
-                "BeforeSymbol StringType: string str",
-                "Enter StringType: string str",
-                "Exit StringType: string str",
+                "BeforeSymbol StringTypeNode: string str",
+                "Enter StringTypeNode: string str",
+                "Exit StringTypeNode: string str",
                 "BeforeSymbol StringLiteral: string str",
                 "Enter StringLiteral: string str",
                 "Exit StringLiteral: string str",
@@ -54,9 +54,9 @@ class SymbolTableTest {
                 "Enter StatementsBlock: string str",
                 "BeforeSymbol VariableDeclaration: string str",
                 "Enter VariableDeclaration: string str, int i",
-                "BeforeSymbol IntType: string str, int i",
-                "Enter IntType: string str, int i",
-                "Exit IntType: string str, int i",
+                "BeforeSymbol IntTypeNode: string str, int i",
+                "Enter IntTypeNode: string str, int i",
+                "Exit IntTypeNode: string str, int i",
                 "BeforeSymbol IntLiteral: string str, int i",
                 "Enter IntLiteral: string str, int i",
                 "Exit IntLiteral: string str, int i",
@@ -70,10 +70,10 @@ class SymbolTableTest {
     @Test
     fun canProcessWithSymbolsSpecificNodeType() {
         val ast = Program(listOf(
-                VariableDeclaration(StringType(), "str", StringLiteral("Hello")),
+                VariableDeclaration(StringTypeNode(), "str", StringLiteral("Hello")),
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0))
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0))
                         )))
         ))
 

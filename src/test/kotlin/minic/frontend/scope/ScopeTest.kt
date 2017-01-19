@@ -1,11 +1,8 @@
 package minic.frontend.scope
 
-import minic.frontend.ast.*
-import minic.frontend.scope.*
+import minic.frontend.type.*
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 class ScopeTest {
 
@@ -13,7 +10,7 @@ class ScopeTest {
     fun canDefineResolveSymbol() {
         val scope = GlobalScope()
 
-        val xSymbol = VariableSymbol("x", IntType())
+        val xSymbol = VariableSymbol("x", IntType)
 
         scope.define(xSymbol)
 
@@ -26,9 +23,9 @@ class ScopeTest {
         val localScope1 = LocalScope(globalScope)
         val localScope2 = LocalScope(localScope1)
 
-        val xSymbol = VariableSymbol("x", IntType())
-        val ySymbol = VariableSymbol("y", IntType())
-        val zSymbol = VariableSymbol("z", IntType())
+        val xSymbol = VariableSymbol("x", IntType)
+        val ySymbol = VariableSymbol("y", IntType)
+        val zSymbol = VariableSymbol("z", IntType)
 
         globalScope.define(xSymbol)
         localScope1.define(ySymbol)
@@ -46,9 +43,9 @@ class ScopeTest {
         val localScope1 = LocalScope(globalScope)
         val localScope2 = LocalScope(localScope1)
 
-        val xSymbol = VariableSymbol("x", IntType())
-        val ySymbol = VariableSymbol("y", IntType())
-        val zSymbol = VariableSymbol("z", IntType())
+        val xSymbol = VariableSymbol("x", IntType)
+        val ySymbol = VariableSymbol("y", IntType)
+        val zSymbol = VariableSymbol("z", IntType)
 
         globalScope.define(xSymbol)
         localScope1.define(ySymbol)

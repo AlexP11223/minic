@@ -1,5 +1,11 @@
 package minic.frontend.ast
 
+import minic.frontend.type.BoolType
+import minic.frontend.type.DoubleType
+import minic.frontend.type.IntType
+import minic.frontend.type.StringType
+import minic.frontend.type.Type
+
 
 data class Program(val statements: List<Statement>, override val position: Position? = null) : AstNode {
     override fun children(): List<AstNode> = statements
@@ -25,7 +31,7 @@ data class WhileStatement(val expr: Expression, val statement: Statement, overri
 
 data class BreakStatement(override val position: Position? = null) : Statement
 
-data class VariableDeclaration(val variableType: Type, val variableName: String, val value: Expression, override val position: Position? = null) : Statement {
+data class VariableDeclaration(val variableType: TypeNode, val variableName: String, val value: Expression, override val position: Position? = null) : Statement {
     override fun children(): List<AstNode> = listOf(variableType, value)
 }
 
@@ -37,15 +43,27 @@ data class Assignment(val variableName: String, val value: Expression, override 
 // Types
 //
 
-interface Type : AstNode {
-    val name: String
-        get() = javaClass.simpleName.removeSuffix("Type").toLowerCase()
+interface TypeNode : AstNode {
+    val type: Type
+
+    val name: String get() = type.name
 }
 
-data class IntType(override val position: Position? = null) : Type
-data class DoubleType(override val position: Position? = null) : Type
-data class StringType(override val position: Position? = null) : Type
-data class BoolType(override val position: Position? = null) : Type
+data class IntTypeNode(override val position: Position? = null) : TypeNode {
+    override val type: Type get() = IntType
+}
+
+data class DoubleTypeNode(override val position: Position? = null) : TypeNode {
+    override val type: Type get() = DoubleType
+}
+
+data class StringTypeNode(override val position: Position? = null) : TypeNode {
+    override val type: Type get() = StringType
+}
+
+data class BoolTypeNode(override val position: Position? = null) : TypeNode {
+    override val type: Type get() = BoolType
+}
 
 //
 // Expressions

@@ -1,6 +1,6 @@
 package minic.frontend.scope
 
-import minic.frontend.ast.Type
+import minic.frontend.type.Type
 
 interface Symbol {
     val name: String

@@ -53,11 +53,11 @@ bool xb = true;
 int y = x;
 """
         val expectedAst = Program(listOf(
-                VariableDeclaration(IntType(), "x", IntLiteral(42)),
-                VariableDeclaration(DoubleType(), "xf", FloatLiteral(42.5)),
-                VariableDeclaration(StringType(), "xs", StringLiteral("Hello")),
-                VariableDeclaration(BoolType(), "xb", BooleanLiteral(true)),
-                VariableDeclaration(IntType(), "y", VariableReference("x"))
+                VariableDeclaration(IntTypeNode(), "x", IntLiteral(42)),
+                VariableDeclaration(DoubleTypeNode(), "xf", FloatLiteral(42.5)),
+                VariableDeclaration(StringTypeNode(), "xs", StringLiteral("Hello")),
+                VariableDeclaration(BoolTypeNode(), "xb", BooleanLiteral(true)),
+                VariableDeclaration(IntTypeNode(), "y", VariableReference("x"))
         ))
 
         assertEquals(expectedAst, ast(code))
@@ -148,7 +148,7 @@ while (!flag)
         val expectedAst = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0)),
                                 BreakStatement()
                         ))),
                 WhileStatement(NotExpression(VariableReference("flag")),
@@ -171,7 +171,7 @@ if (!flag)
         val expectedAst = Program(listOf(
                 IfStatement(AndExpression(VariableReference("flag1"), NotExpression(VariableReference("flag2"))),
                         StatementsBlock(listOf(
-                                VariableDeclaration(StringType(), "s", StringLiteral("Hello")),
+                                VariableDeclaration(StringTypeNode(), "s", StringLiteral("Hello")),
                                 Assignment("s2", AdditionExpression(VariableReference("s"), VariableReference("s2")))
                         )), null),
                 IfStatement(NotExpression(VariableReference("flag")),
@@ -199,11 +199,11 @@ else
         val expectedAst = Program(listOf(
                 IfStatement(AndExpression(VariableReference("flag1"), NotExpression(VariableReference("flag2"))),
                         StatementsBlock(listOf(
-                                VariableDeclaration(StringType(), "s", StringLiteral("Hello")),
+                                VariableDeclaration(StringTypeNode(), "s", StringLiteral("Hello")),
                                 Assignment("s2", AdditionExpression(VariableReference("s"), VariableReference("s2")))
                         )),
                         StatementsBlock(listOf(
-                                VariableDeclaration(StringType(), "s", StringLiteral("Hello1")),
+                                VariableDeclaration(StringTypeNode(), "s", StringLiteral("Hello1")),
                                 Assignment("s2", AdditionExpression(VariableReference("s"), VariableReference("s2")))
                         ))),
                 IfStatement(NotExpression(VariableReference("flag")),
@@ -303,7 +303,7 @@ if (a == 42 && b > 1 && c < 0 && d >= 10.5 && -1 <= e && str != "Hello") {
 int y = 1.5 + x;"""
         val expectedAst = Program(listOf(
                 Assignment("x", IntLiteral(42, pos(1, 4, 1, 6)), pos(1, 0, 1, 7)),
-                VariableDeclaration(IntType(pos(2, 0, 2, 3)), "y",
+                VariableDeclaration(IntTypeNode(pos(2, 0, 2, 3)), "y",
                         AdditionExpression(
                                 FloatLiteral(1.5, pos(2, 8, 2, 11)),
                                 VariableReference("x", pos(2, 14, 2, 15)),

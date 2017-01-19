@@ -11,7 +11,7 @@ class AstNodeTest {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", UnaryMinusExpression(IntLiteral(1))),
+                                VariableDeclaration(IntTypeNode(), "i", UnaryMinusExpression(IntLiteral(1))),
                                 BreakStatement()
                         ))),
                 IfStatement(NotExpression(VariableReference("flag")),
@@ -31,7 +31,7 @@ class AstNodeTest {
                 "BooleanLiteral",
                 "StatementsBlock",
                 "VariableDeclaration",
-                "IntType",
+                "IntTypeNode",
                 "UnaryMinusExpression",
                 "IntLiteral",
                 "BreakStatement",
@@ -54,13 +54,13 @@ class AstNodeTest {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0)),
                                 BreakStatement()
                         ))),
                 IfStatement(NotExpression(VariableReference("flag")),
                         Assignment("x", AdditionExpression(VariableReference("x"), IntLiteral(42))),
                         Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42)))),
-                VariableDeclaration(StringType(), "s", StringLiteral("Hello"))
+                VariableDeclaration(StringTypeNode(), "s", StringLiteral("Hello"))
         ))
 
         val result = mutableListOf<String>()
@@ -80,7 +80,7 @@ class AstNodeTest {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0)),
                                 BreakStatement()
                         ))),
                 IfStatement(NotExpression(VariableReference("flag")),
@@ -110,13 +110,13 @@ class AstNodeTest {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0)),
                                 BreakStatement()
                         ))),
                 IfStatement(NotExpression(VariableReference("flag")),
                         Assignment("x", AdditionExpression(VariableReference("x"), IntLiteral(42))),
                         Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42)))),
-                VariableDeclaration(StringType(), "s", StringLiteral("Hello"))
+                VariableDeclaration(StringTypeNode(), "s", StringLiteral("Hello"))
         ))
 
         val result = mutableListOf<String>()
@@ -138,7 +138,7 @@ class AstNodeTest {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0)),
                                 BreakStatement()
                         ))),
                 IfStatement(NotExpression(VariableReference("flag")),
@@ -171,7 +171,7 @@ class AstNodeTest {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0)),
                                 BreakStatement()
                         )))
         ))
@@ -191,8 +191,8 @@ class AstNodeTest {
                 "Exit BooleanLiteral",
                 "Enter StatementsBlock",
                 "Enter VariableDeclaration",
-                "Enter IntType",
-                "Exit IntType",
+                "Enter IntTypeNode",
+                "Exit IntTypeNode",
                 "Enter IntLiteral",
                 "Exit IntLiteral",
                 "Exit VariableDeclaration",
@@ -209,7 +209,7 @@ class AstNodeTest {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0)),
                                 BreakStatement(),
                                 IfStatement(NotExpression(VariableReference("flag")),
                                         StatementsBlock(listOf()),

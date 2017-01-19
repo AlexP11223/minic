@@ -15,7 +15,7 @@ fun AstNode.processWithSymbols(scope: Scope,
     beforeSymbolOperation(this, currentScope)
 
     when (this) {
-        is VariableDeclaration -> currentScope.define(VariableSymbol(variableName, variableType))
+        is VariableDeclaration -> currentScope.define(VariableSymbol(variableName, variableType.type))
         is StatementsBlock -> currentScope = LocalScope(currentScope)
     }
 
