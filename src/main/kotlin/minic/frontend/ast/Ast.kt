@@ -73,7 +73,9 @@ data class MultiplicationExpression(override val left: Expression, override val 
 data class DivisionExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression
 data class ModExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression
 
-data class UnaryMinusExpression(val value: Expression, override val position: Position? = null) : Expression
+data class UnaryMinusExpression(val value: Expression, override val position: Position? = null) : Expression {
+    override fun children(): List<AstNode> = listOf(value)
+}
 
 interface LogicalExpression : Expression
 

@@ -11,7 +11,7 @@ class AstNodeTest {
         val ast = Program(listOf(
                 WhileStatement(BooleanLiteral(true),
                         StatementsBlock(listOf(
-                                VariableDeclaration(IntType(), "i", IntLiteral(0)),
+                                VariableDeclaration(IntType(), "i", UnaryMinusExpression(IntLiteral(1))),
                                 BreakStatement()
                         ))),
                 IfStatement(NotExpression(VariableReference("flag")),
@@ -32,6 +32,7 @@ class AstNodeTest {
                 "StatementsBlock",
                 "VariableDeclaration",
                 "IntType",
+                "UnaryMinusExpression",
                 "IntLiteral",
                 "BreakStatement",
                 "IfStatement",
