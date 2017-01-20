@@ -9,7 +9,10 @@ statement
     | SEMI                                                                  # emptyStatement
     | assignment                                                            # assignmentStatement
     | declaration                                                           # variableDeclarationStatement
-    | 'if' parExpression ifBody=statement ('else' elseBody=statement)?      # ifStatement
+    | 'if' parExpression ifBody=statement ('else' elseBody=statement
+          // using semantic predicate instead of ('else' elseBody=statement)?
+          // in order to avoid ambiguity warnings (dangling else)
+                                        | {_input.LA(1) != ELSE_KEYWORD}?)  # ifStatement
     | 'while' parExpression statement                                       # whileStatement
     | 'break' SEMI                                                          # breakStatement
     | 'exit' SEMI                                                           # exitStatement

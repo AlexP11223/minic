@@ -211,8 +211,7 @@ else
                         Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42))))
         ))
 
-        // disabled ambiguity checks. Not sure if it is ok, but it seems to work as expected (dangling else)
-        assertEquals(expectedAst, ast(code, diagnosticChecks = false))
+        assertEquals(expectedAst, ast(code))
     }
 
     @Test
@@ -259,8 +258,7 @@ else
                         Assignment("x", IntLiteral(44)))
         ))
 
-        // disabled ambiguity checks. Not sure if it is ok, but it seems to work as expected (dangling else)
-        assertEquals(expectedAst, ast(code, diagnosticChecks = false))
+        assertEquals(expectedAst, ast(code))
     }
 
     @Test

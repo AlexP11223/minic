@@ -82,8 +82,7 @@ if (true) {
                 Error("Variable declaration not allowed here", Point(14, 4))
         )
 
-        // disabled ambiguity checks (dangling else)
-        assertEquals(expectedErrors, validate(code, diagnosticChecks = false))
+        assertEquals(expectedErrors, validate(code))
     }
 
     @Test
@@ -112,8 +111,7 @@ f = g + h;
                 Error("Variable 'h' is not declared", Point(11, 8))
         )
 
-        // disabled ambiguity checks (dangling else)
-        assertEquals(expectedErrors, validate(code, diagnosticChecks = false))
+        assertEquals(expectedErrors, validate(code))
     }
 
     @Test
@@ -139,7 +137,6 @@ while (true) {
                 Error("Variable 'a' is already declared", Point(9, 8))
         )
 
-        // disabled ambiguity checks (dangling else)
-        assertEquals(expectedErrors, validate(code, diagnosticChecks = false))
+        assertEquals(expectedErrors, validate(code))
     }
 }
