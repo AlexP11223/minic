@@ -15,7 +15,7 @@ statement
                                         | {_input.LA(1) != ELSE_KEYWORD}?)  # ifStatement
     | 'while' parExpression statement                                       # whileStatement
     | 'break' SEMI                                                          # breakStatement
-    | 'exit' SEMI                                                           # exitStatement
+    | 'exit' '(' ')' SEMI                                                   # exitStatement
     | 'print' parExpression SEMI                                            # printStatement
     | 'println' parExpression SEMI                                          # printlnStatement
     ;
@@ -91,6 +91,7 @@ ELSE_KEYWORD: 'else';
 WHILE_KEYWORD: 'while';
 BREAK_KEYWORD: 'break';
 CONTINUE_KEYWORD: 'continue';
+
 EXIT_KEYWORD: 'exit';
 
 INT_TYPE: 'int';

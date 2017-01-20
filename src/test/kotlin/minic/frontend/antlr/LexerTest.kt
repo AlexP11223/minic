@@ -38,10 +38,10 @@ class LexerTest {
                                 "Identifier", "LTEQ", "IntegerLiteral", "AND", "Identifier", "GTEQ", "MINUS", "IntegerLiteral", "RPAR", "EOF"),
                         "(a == 42 && a > b) || (a != 43 && b < c && c <= 0 && d >= -1)"),
                 arrayOf(listOf("IF_KEYWORD", "LPAR", "Identifier", "GT", "IntegerLiteral", "RPAR",
-                        "LBRACE", "EXIT_KEYWORD", "SEMI", "RBRACE", "EOF"),
+                        "LBRACE", "EXIT_KEYWORD", "LPAR", "RPAR", "SEMI", "RBRACE", "EOF"),
                         """
 if (x > 10) {
-    exit;
+    exit();
 }
                         """),
                 arrayOf(listOf("WHILE_KEYWORD", "LPAR", "BooleanLiteral", "RPAR", "LBRACE", "RBRACE", "EOF"),

@@ -8,7 +8,7 @@ int age = readInt();
 
 if (age < 10) {
     println("Sorry, you are not old enough to learn about compilers");
-    exit;
+    exit();
 }
 
 println("Hello " + name);
