@@ -1,7 +1,10 @@
 package minic.frontend.validation
 
+import minic.frontend.IllegalExpressionException
+import minic.frontend.UndefinedSymbolException
 import minic.frontend.ast.*
 import minic.frontend.scope.*
+import minic.frontend.type.*
 
 fun Program.validate() : List<Error> {
     val errors = mutableListOf<Error>()
@@ -46,5 +49,48 @@ fun Program.validate() : List<Error> {
         return true
     })
 
-    return errors.sortedBy { it.position }
+    // check expression types
+    // expressions can be only inside of some statements, so we need to check only them
+    // for incompatible types inside expressions type() throws exceptions
+    this.processWithSymbols(Statement::class.java, enterOperation = { node, scope ->
+        try {
+            when (node) {
+                is VariableDeclaration -> {
+                    val exprType = node.value.type(scope)
+                    if (exprType != node.variableType && !exprType.canPromoteTo(node.variableType.type)) {
+                        errors.add(Error("Cannot assign expression of type '${exprType.name}' to a variable of type '${node.variableType.name}'", node.position!!.start))
+                    }
+                }
+                is Assignment -> {
+                    val variable = scope.resolve(node.variableName)
+                    if (variable != null) {
+                        val exprType = node.value.type(scope)
+                        if (exprType != variable.type && !exprType.canPromoteTo(variable.type)) {
+                            errors.add(Error("Cannot assign expression of type '${exprType.name}' to a variable of type '${variable.type.name}'", node.position!!.start))
+                        }
+                    }
+                }
+                is IfStatement -> {
+                    val exprType = node.expr.type(scope)
+                    if (exprType !is BoolType) {
+                        errors.add(Error("Expression must be '${BoolType.name}', got '${exprType.name}'", node.expr.position!!.start))
+                    }
+                }
+                is WhileStatement -> {
+                    val exprType = node.expr.type(scope)
+                    if (exprType !is BoolType) {
+                        errors.add(Error("Expression must be '${BoolType.name}', got '${exprType.name}'", node.expr.position!!.start))
+                    }
+                }
+            }
+        }
+        catch (e: UndefinedSymbolException) {
+            // ignore, should be already detected
+        }
+        catch (e: IllegalExpressionException) {
+            errors.add(Error(e.message ?: "Illegal expression", e.node.position!!.start))
+        }
+    })
+
+    return errors.distinct().sortedBy { it.position }
 }

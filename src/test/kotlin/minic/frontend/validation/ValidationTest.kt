@@ -2,7 +2,6 @@ package minic.frontend.validation
 
 import minic.Compiler
 import minic.frontend.ast.Point
-import minic.frontend.validation.Error
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -51,7 +50,7 @@ if (true) {
     }
 
     @Test
-    fun dontAllowVarDeclarationInNonBlockIfWhile() {
+    fun doesntAllowVarDeclarationInNonBlockIfWhile() {
         val code = """
 int a = 42;
 while (true)
@@ -86,7 +85,7 @@ if (true) {
     }
 
     @Test
-    fun detectUndeclaredVariables() {
+    fun detectsUndeclaredVariables() {
         val code = """
 a = 42;
 while (true)
@@ -115,7 +114,7 @@ f = g + h;
     }
 
     @Test
-    fun detectRedeclaredVariables() {
+    fun detectsRedeclaredVariables() {
         val code = """
 int a = 42;
 int a = 43;
@@ -135,6 +134,106 @@ while (true) {
                 Error("Variable 'a' is already declared", Point(4, 4)),
                 Error("Variable 'a' is already declared", Point(6, 8)),
                 Error("Variable 'a' is already declared", Point(9, 8))
+        )
+
+        assertEquals(expectedErrors, validate(code))
+    }
+
+    @Test
+    fun detectsIncompatibleVarDeclarationType() {
+        val code = """
+string a = 42;
+bool b = 42;
+int c = 42.5;
+double d = "hello";
+int i = 0;
+string e = i;
+while (true) {
+    bool f = "hello";
+}
+""".trim()
+
+        val expectedErrors = listOf(
+                Error("Cannot assign expression of type 'int' to a variable of type 'string'", Point(1, 0)),
+                Error("Cannot assign expression of type 'int' to a variable of type 'bool'", Point(2, 0)),
+                Error("Cannot assign expression of type 'double' to a variable of type 'int'", Point(3, 0)),
+                Error("Cannot assign expression of type 'string' to a variable of type 'double'", Point(4, 0)),
+                Error("Cannot assign expression of type 'int' to a variable of type 'string'", Point(6, 0)),
+                Error("Cannot assign expression of type 'string' to a variable of type 'bool'", Point(8, 4))
+        )
+
+        assertEquals(expectedErrors, validate(code))
+    }
+
+    @Test
+    fun detectsIncompatibleVarAssignmentType() {
+        val code = """
+int i = 0;
+double fnum = 0.0;
+string str = "Hello";
+bool flag = true;
+
+i = 42.5;
+flag = 42;
+str = 42;
+fnum = "hello";
+str = i;
+while (true) {
+    flag = "hello";
+}
+""".trim()
+
+        val expectedErrors = listOf(
+                Error("Cannot assign expression of type 'double' to a variable of type 'int'", Point(6, 0)),
+                Error("Cannot assign expression of type 'int' to a variable of type 'bool'", Point(7, 0)),
+                Error("Cannot assign expression of type 'int' to a variable of type 'string'", Point(8, 0)),
+                Error("Cannot assign expression of type 'string' to a variable of type 'double'", Point(9, 0)),
+                Error("Cannot assign expression of type 'int' to a variable of type 'string'", Point(10, 0)),
+                Error("Cannot assign expression of type 'string' to a variable of type 'bool'", Point(12, 4))
+        )
+
+        assertEquals(expectedErrors, validate(code))
+    }
+
+    @Test
+    fun allowsOnlyBooleanIfExpr() {
+        val code = """
+if (1) { }
+if (42.5) { }
+if ("hello") {
+    int i = 0;
+    if (i) { }
+    else if (i+i) { }
+}
+""".trim()
+
+        val expectedErrors = listOf(
+                Error("Expression must be 'bool', got 'int'", Point(1, 4)),
+                Error("Expression must be 'bool', got 'double'", Point(2, 4)),
+                Error("Expression must be 'bool', got 'string'", Point(3, 4)),
+                Error("Expression must be 'bool', got 'int'", Point(5, 8)),
+                Error("Expression must be 'bool', got 'int'", Point(6, 13))
+        )
+
+        assertEquals(expectedErrors, validate(code))
+    }
+
+    @Test
+    fun allowsOnlyBooleanWhileExpr() {
+        val code = """
+while (1) { }
+while (42.5) { }
+while ("hello") {
+    int i = 0;
+    while (i) { }
+}
+""".trim()
+
+        val expectedErrors = listOf(
+                Error("Expression must be 'bool', got 'int'", Point(1, 7)),
+                Error("Expression must be 'bool', got 'double'", Point(2, 7)),
+                Error("Expression must be 'bool', got 'string'", Point(3, 7)),
+                Error("Expression must be 'bool', got 'int'", Point(5, 11))
         )
 
         assertEquals(expectedErrors, validate(code))
