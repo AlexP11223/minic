@@ -27,6 +27,7 @@ class AntlrToAstMapper(val setPosition: Boolean = true) {
         is IfStatementContext -> IfStatement(parExpression().expression().toAst(), ifBody.toAst(), elseBody?.toAst(), position())
         is WhileStatementContext -> WhileStatement(parExpression().expression().toAst(), statement().toAst(), position())
         is BreakStatementContext -> BreakStatement(position())
+        is ExitStatementContext -> ExitStatement(position())
         is VariableDeclarationStatementContext -> VariableDeclaration(declaration().type().toAst(), declaration().Identifier().text, declaration().expression().toAst(), position())
         is AssignmentStatementContext -> Assignment(assignment().Identifier().text, assignment().expression().toAst(), position())
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)

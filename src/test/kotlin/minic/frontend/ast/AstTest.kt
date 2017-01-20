@@ -295,6 +295,22 @@ if (a == 42 && b > 1 && c < 0 && d >= 10.5 && -1 <= e && str != "Hello") {
     }
 
     @Test
+    fun parsesExitStatement() {
+        val code =  """
+if (flag)
+    exit();
+exit();
+"""
+        val expectedAst = Program(listOf(
+                IfStatement(VariableReference("flag"),
+                        ExitStatement(), null),
+                ExitStatement()
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
     fun parsesWithPosition() {
         val code =
 """x = 42;

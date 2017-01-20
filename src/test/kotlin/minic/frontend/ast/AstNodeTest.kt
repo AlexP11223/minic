@@ -16,7 +16,8 @@ class AstNodeTest {
                         ))),
                 IfStatement(NotExpression(VariableReference("flag")),
                         Assignment("x", AdditionExpression(VariableReference("x"), IntLiteral(42))),
-                        Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42))))
+                        Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42)))),
+                ExitStatement()
         ))
 
         val result = mutableListOf<String>()
@@ -45,7 +46,8 @@ class AstNodeTest {
                 "Assignment",
                 "SubtractionExpression",
                 "VariableReference",
-                "IntLiteral"
+                "IntLiteral",
+                "ExitStatement"
         ), result)
     }
 
