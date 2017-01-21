@@ -39,6 +39,9 @@ class AntlrToAstMapper(val setPosition: Boolean = true) {
         is UnaryOperationContext -> toAst()
         is ParenthesesExpressionContext -> parExpression().expression().toAst()
         is VariableReferenceContext -> VariableReference(text, position())
+        is ReadIntContext -> ReadInt(position())
+        is ReadDoubleContext -> ReadDouble(position())
+        is ReadLineContext -> ReadLine(position())
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 

@@ -91,6 +91,9 @@ fun Expression.type(scope: Scope) : Type {
         is StringLiteral -> StringType
         is BooleanLiteral -> BoolType
         is VariableReference -> scope.resolve(variableName)?.type ?: throw UndefinedSymbolException("Variable '$variableName' is not defined", this)
+        is ReadInt -> IntType
+        is ReadDouble -> DoubleType
+        is ReadLine -> StringType
         is NotExpression -> {
             val exprType = expr.type(scope)
             if (exprType != BoolType) {

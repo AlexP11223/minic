@@ -311,6 +311,22 @@ exit();
     }
 
     @Test
+    fun parsesRead() {
+        val code =  """
+int x = readInt();
+double xf = readDouble();
+string xs = readLine();
+"""
+        val expectedAst = Program(listOf(
+                VariableDeclaration(IntTypeNode(), "x", ReadInt()),
+                VariableDeclaration(DoubleTypeNode(), "xf", ReadDouble()),
+                VariableDeclaration(StringTypeNode(), "xs", ReadLine())
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
     fun parsesWithPosition() {
         val code =
 """x = 42;

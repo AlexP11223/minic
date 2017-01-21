@@ -195,6 +195,18 @@ class ExpressionTest {
     }
 
     @Test
+    fun determinesReadType() {
+        listOf<Pair<Expression, Type>>(
+                ReadInt() to IntType,
+                ReadDouble() to DoubleType,
+                ReadLine() to StringType
+        ).forEach {
+            val (expr, expectedType) = it
+            assertEquals(expectedType, expr.type(scope), "$expr $expectedType")
+        }
+    }
+
+    @Test
     fun failsWhenUndeclaredVar() {
         listOf<Expression>(
                 VariableReference("undefined"),

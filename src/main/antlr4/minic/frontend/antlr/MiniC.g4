@@ -35,9 +35,9 @@ expression
     | left=expression op='&&' right=expression                          # binaryOperation
     | left=expression op='||' right=expression                          # binaryOperation
     | parExpression                                                     # parenthesesExpression
-    | 'readInt()'                                                       # readInt
-    | 'readDouble()'                                                    # readDouble
-    | 'readLine()'                                                      # readLine
+    | 'readInt' '(' ')'                                                 # readInt
+    | 'readDouble' '(' ')'                                              # readDouble
+    | 'readLine' '(' ')'                                                # readLine
     | 'toString' parExpression                                          # toString
     ;
 
@@ -93,6 +93,9 @@ BREAK_KEYWORD: 'break';
 CONTINUE_KEYWORD: 'continue';
 
 EXIT_KEYWORD: 'exit';
+READ_INT_KEYWORD: 'readInt';
+READ_DOUBLE_KEYWORD: 'readDouble';
+READ_LINE_KEYWORD: 'readLine';
 
 INT_TYPE: 'int';
 DOUBLE_TYPE: 'double';

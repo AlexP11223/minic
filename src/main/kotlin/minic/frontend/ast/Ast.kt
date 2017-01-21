@@ -116,3 +116,7 @@ data class LessExpression(override val left: Expression, override val right: Exp
 data class GreaterExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, RelationalExpression
 data class LessOrEqualExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, RelationalExpression
 data class GreaterOrEqualExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression, RelationalExpression
+
+data class ReadInt(override val position: Position? = null) : Expression
+data class ReadDouble(override val position: Position? = null) : Expression
+data class ReadLine(override val position: Position? = null) : Expression

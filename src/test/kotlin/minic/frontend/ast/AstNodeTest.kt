@@ -17,6 +17,9 @@ class AstNodeTest {
                 IfStatement(NotExpression(VariableReference("flag")),
                         Assignment("x", AdditionExpression(VariableReference("x"), IntLiteral(42))),
                         Assignment("x", SubtractionExpression(VariableReference("x"), IntLiteral(42)))),
+                Assignment("x", ReadInt()),
+                Assignment("f", ReadDouble()),
+                Assignment("s", ReadLine()),
                 ExitStatement()
         ))
 
@@ -47,6 +50,12 @@ class AstNodeTest {
                 "SubtractionExpression",
                 "VariableReference",
                 "IntLiteral",
+                "Assignment",
+                "ReadInt",
+                "Assignment",
+                "ReadDouble",
+                "Assignment",
+                "ReadLine",
                 "ExitStatement"
         ), result)
     }

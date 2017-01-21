@@ -27,6 +27,14 @@ class LexerTest {
                 arrayOf(listOf("BOOL_TYPE", "Identifier", "ASSIGN", "BooleanLiteral", "SEMI",
                                 "Identifier", "ASSIGN", "BooleanLiteral", "SEMI", "EOF"),
                         "bool myVar = true; myVar = false;"),
+
+                arrayOf(listOf("INT_TYPE", "Identifier", "ASSIGN", "READ_INT_KEYWORD", "LPAR", "RPAR", "SEMI", "EOF"),
+                        "int myVar = readInt();"),
+                arrayOf(listOf("DOUBLE_TYPE", "Identifier", "ASSIGN", "READ_DOUBLE_KEYWORD", "LPAR", "RPAR", "SEMI", "EOF"),
+                        "double myVar = readDouble();"),
+                arrayOf(listOf("STRING_TYPE", "Identifier", "ASSIGN", "READ_LINE_KEYWORD", "LPAR", "RPAR", "SEMI", "EOF"),
+                        "string myVar = readLine();"),
+
                 arrayOf(listOf("Identifier", "MUL", "IntegerLiteral", "PLUS",
                                 "Identifier", "DIV", "MINUS", "IntegerLiteral", "MINUS", "Identifier", "MINUS",
                                 "LPAR", "Identifier", "MOD", "IntegerLiteral", "RPAR", "EOF"),
