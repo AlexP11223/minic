@@ -1,6 +1,5 @@
 package minic.frontend.ast
 
-import minic.frontend.ast.*
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -20,6 +19,7 @@ class AstNodeTest {
                 Assignment("x", ReadInt()),
                 Assignment("f", ReadDouble()),
                 Assignment("s", ReadLine()),
+                PrintStatement(VariableReference("s"), appendNewline = true),
                 ExitStatement()
         ))
 
@@ -56,6 +56,8 @@ class AstNodeTest {
                 "ReadDouble",
                 "Assignment",
                 "ReadLine",
+                "PrintStatement",
+                "VariableReference",
                 "ExitStatement"
         ), result)
     }

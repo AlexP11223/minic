@@ -339,6 +339,20 @@ string s = toString(x);
     }
 
     @Test
+    fun parsesPrint() {
+        val code =  """
+println("Hello " + name);
+print(toString(x));
+"""
+        val expectedAst = Program(listOf(
+                PrintStatement(AdditionExpression(StringLiteral("Hello "), VariableReference("name")), appendNewline = true),
+                PrintStatement(ToString(VariableReference("x")), appendNewline = false)
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
     fun parsesWithPosition() {
         val code =
 """x = 42;

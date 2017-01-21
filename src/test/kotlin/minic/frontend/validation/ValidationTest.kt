@@ -238,4 +238,40 @@ while ("hello") {
 
         assertEquals(expectedErrors, validate(code))
     }
+
+    @Test
+    fun printAcceptsOnlyStringExpr() {
+        val code = """
+string name = "Alice";
+int age = 10;
+double f = 10.5;
+bool flag = true;
+
+println("Hello " + name);
+print(name);
+print(toString(age));
+
+print(age);
+println(age);
+print(f);
+println(f);
+print(flag);
+println(flag);
+if (age < 18) {
+    print(age);
+}
+""".trim()
+
+        val expectedErrors = listOf(
+                Error("Expression must be 'string', got 'int'", Point(10, 6)),
+                Error("Expression must be 'string', got 'int'", Point(11, 8)),
+                Error("Expression must be 'string', got 'double'", Point(12, 6)),
+                Error("Expression must be 'string', got 'double'", Point(13, 8)),
+                Error("Expression must be 'string', got 'bool'", Point(14, 6)),
+                Error("Expression must be 'string', got 'bool'", Point(15, 8)),
+                Error("Expression must be 'string', got 'int'", Point(17, 10))
+        )
+
+        assertEquals(expectedErrors, validate(code))
+    }
 }

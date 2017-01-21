@@ -72,14 +72,20 @@ fun Program.validate() : List<Error> {
                 }
                 is IfStatement -> {
                     val exprType = node.expr.type(scope)
-                    if (exprType !is BoolType) {
+                    if (exprType != BoolType) {
                         errors.add(Error("Expression must be '${BoolType.name}', got '${exprType.name}'", node.expr.position!!.start))
                     }
                 }
                 is WhileStatement -> {
                     val exprType = node.expr.type(scope)
-                    if (exprType !is BoolType) {
+                    if (exprType != BoolType) {
                         errors.add(Error("Expression must be '${BoolType.name}', got '${exprType.name}'", node.expr.position!!.start))
+                    }
+                }
+                is PrintStatement -> {
+                    val exprType = node.value.type(scope)
+                    if (exprType != StringType) {
+                        errors.add(Error("Expression must be '${StringType.name}', got '${exprType.name}'", node.value.position!!.start))
                     }
                 }
             }

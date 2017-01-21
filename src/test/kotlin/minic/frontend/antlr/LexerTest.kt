@@ -37,6 +37,9 @@ class LexerTest {
                 arrayOf(listOf("STRING_TYPE", "Identifier", "ASSIGN", "TO_STRING_KEYWORD", "LPAR", "Identifier", "RPAR", "SEMI", "EOF"),
                         "string myVar = toString(n);"),
 
+                arrayOf(listOf("PRINT_KEYWORD", "LPAR", "StringLiteral", "RPAR", "SEMI", "PRINTLN_KEYWORD", "LPAR", "Identifier", "RPAR", "SEMI", "EOF"),
+                        "print(\"Hello \"); println(name);"),
+
                 arrayOf(listOf("Identifier", "MUL", "IntegerLiteral", "PLUS",
                                 "Identifier", "DIV", "MINUS", "IntegerLiteral", "MINUS", "Identifier", "MINUS",
                                 "LPAR", "Identifier", "MOD", "IntegerLiteral", "RPAR", "EOF"),

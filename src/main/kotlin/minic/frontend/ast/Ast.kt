@@ -41,6 +41,10 @@ data class Assignment(val variableName: String, val value: Expression, override 
 
 data class ExitStatement(override val position: Position? = null) : Statement
 
+data class PrintStatement(val value: Expression, val appendNewline: Boolean, override val position: Position? = null) : Statement {
+    override fun children(): List<AstNode> = listOf(value)
+}
+
 //
 // Types
 //

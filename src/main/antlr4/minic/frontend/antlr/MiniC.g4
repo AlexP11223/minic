@@ -97,6 +97,8 @@ READ_INT_KEYWORD: 'readInt';
 READ_DOUBLE_KEYWORD: 'readDouble';
 READ_LINE_KEYWORD: 'readLine';
 TO_STRING_KEYWORD: 'toString';
+PRINT_KEYWORD: 'print';
+PRINTLN_KEYWORD: 'println';
 
 INT_TYPE: 'int';
 DOUBLE_TYPE: 'double';
