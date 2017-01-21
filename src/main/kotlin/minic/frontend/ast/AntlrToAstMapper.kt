@@ -42,6 +42,7 @@ class AntlrToAstMapper(val setPosition: Boolean = true) {
         is ReadIntContext -> ReadInt(position())
         is ReadDoubleContext -> ReadDouble(position())
         is ReadLineContext -> ReadLine(position())
+        is ToStringContext -> ToString(parExpression().expression().toAst(), position())
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 

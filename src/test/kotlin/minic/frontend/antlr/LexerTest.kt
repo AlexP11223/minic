@@ -3,7 +3,6 @@ package minic.frontend.antlr
 import com.tngtech.java.junit.dataprovider.DataProvider
 import com.tngtech.java.junit.dataprovider.DataProviderRunner
 import com.tngtech.java.junit.dataprovider.UseDataProvider
-import minic.frontend.antlr.MiniCLexer
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +33,9 @@ class LexerTest {
                         "double myVar = readDouble();"),
                 arrayOf(listOf("STRING_TYPE", "Identifier", "ASSIGN", "READ_LINE_KEYWORD", "LPAR", "RPAR", "SEMI", "EOF"),
                         "string myVar = readLine();"),
+
+                arrayOf(listOf("STRING_TYPE", "Identifier", "ASSIGN", "TO_STRING_KEYWORD", "LPAR", "Identifier", "RPAR", "SEMI", "EOF"),
+                        "string myVar = toString(n);"),
 
                 arrayOf(listOf("Identifier", "MUL", "IntegerLiteral", "PLUS",
                                 "Identifier", "DIV", "MINUS", "IntegerLiteral", "MINUS", "Identifier", "MINUS",

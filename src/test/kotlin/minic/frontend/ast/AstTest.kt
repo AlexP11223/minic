@@ -327,6 +327,18 @@ string xs = readLine();
     }
 
     @Test
+    fun parsesToString() {
+        val code =  """
+string s = toString(x);
+"""
+        val expectedAst = Program(listOf(
+                VariableDeclaration(StringTypeNode(), "s", ToString(VariableReference("x")))
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
     fun parsesWithPosition() {
         val code =
 """x = 42;

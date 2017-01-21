@@ -94,6 +94,7 @@ fun Expression.type(scope: Scope) : Type {
         is ReadInt -> IntType
         is ReadDouble -> DoubleType
         is ReadLine -> StringType
+        is ToString -> StringType
         is NotExpression -> {
             val exprType = expr.type(scope)
             if (exprType != BoolType) {

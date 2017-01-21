@@ -96,6 +96,7 @@ EXIT_KEYWORD: 'exit';
 READ_INT_KEYWORD: 'readInt';
 READ_DOUBLE_KEYWORD: 'readDouble';
 READ_LINE_KEYWORD: 'readLine';
+TO_STRING_KEYWORD: 'toString';
 
 INT_TYPE: 'int';
 DOUBLE_TYPE: 'double';

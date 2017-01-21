@@ -207,6 +207,19 @@ class ExpressionTest {
     }
 
     @Test
+    fun determinesToStringType() {
+        listOf<Pair<Expression, Type>>(
+                ToString(VariableReference("i")) to StringType,
+                ToString(VariableReference("fnum")) to StringType,
+                ToString(VariableReference("flag")) to StringType,
+                ToString(VariableReference("str")) to StringType
+        ).forEach {
+            val (expr, expectedType) = it
+            assertEquals(expectedType, expr.type(scope), "$expr $expectedType")
+        }
+    }
+
+    @Test
     fun failsWhenUndeclaredVar() {
         listOf<Expression>(
                 VariableReference("undefined"),

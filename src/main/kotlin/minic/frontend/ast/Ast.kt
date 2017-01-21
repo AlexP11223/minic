@@ -120,3 +120,5 @@ data class GreaterOrEqualExpression(override val left: Expression, override val 
 data class ReadInt(override val position: Position? = null) : Expression
 data class ReadDouble(override val position: Position? = null) : Expression
 data class ReadLine(override val position: Position? = null) : Expression
+
+data class ToString(val value: Expression, override val position: Position? = null) : Expression
