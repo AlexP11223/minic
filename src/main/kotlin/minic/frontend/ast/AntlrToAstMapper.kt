@@ -10,14 +10,14 @@ import org.antlr.v4.runtime.Token
 fun Token.startPoint() = Point(line, charPositionInLine)
 fun Token.endPoint() = Point(line, charPositionInLine + (if (type != MiniCLexer.EOF) text.length else 0))
 
-class AntlrToAstMapper(val setPosition: Boolean = true) {
+class AntlrToAstMapper(val withPositions: Boolean = true) {
 
     fun map(antlrProgramContext: ProgramContext) : Program {
         return antlrProgramContext.toAst()
     }
 
     fun ParserRuleContext.position() : Position? {
-        return if (setPosition) Position(start.startPoint(), stop.endPoint()) else null
+        return if (withPositions) Position(start.startPoint(), stop.endPoint()) else null
     }
 
     fun ProgramContext.toAst() : Program = Program(this.statement().map { it.toAst() }, position())
@@ -30,8 +30,8 @@ class AntlrToAstMapper(val setPosition: Boolean = true) {
         is ExitStatementContext -> ExitStatement(position())
         is VariableDeclarationStatementContext -> VariableDeclaration(declaration().type().toAst(), declaration().Identifier().text, declaration().expression().toAst(), position())
         is AssignmentStatementContext -> Assignment(assignment().Identifier().text, assignment().expression().toAst(), position())
-        is PrintStatementContext -> PrintStatement(parExpression().expression().toAst(), appendNewline = false)
-        is PrintlnStatementContext -> PrintStatement(parExpression().expression().toAst(), appendNewline = true)
+        is PrintStatementContext -> PrintStatement(parExpression().expression().toAst(), newline = false)
+        is PrintlnStatementContext -> PrintStatement(parExpression().expression().toAst(), newline = true)
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 

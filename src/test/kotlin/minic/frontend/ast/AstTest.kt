@@ -1,7 +1,6 @@
 package minic.frontend.ast
 
 import minic.Compiler
-import minic.frontend.ast.*
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -9,14 +8,14 @@ import kotlin.test.assertTrue
 class AstTest {
     fun pos(startLine: Int, startCol: Int, endLine: Int, endCol: Int) = Position(Point(startLine,startCol), Point(endLine,endCol))
 
-    fun ast(code: String, setPosition: Boolean = false, diagnosticChecks: Boolean = true): Program {
+    fun ast(code: String, withPositions: Boolean = false, diagnosticChecks: Boolean = true): Program {
         val parsingResult = Compiler(diagnosticChecks).parse(code)
 
         assertTrue(parsingResult.errors.isEmpty(), "Parsng errors\n" + parsingResult.errors)
 
         val antlrTree = parsingResult.root
 
-        val mapper = AntlrToAstMapper(setPosition)
+        val mapper = AntlrToAstMapper(withPositions)
         val ast = mapper.map(antlrTree)
         return ast
     }
@@ -345,8 +344,8 @@ println("Hello " + name);
 print(toString(x));
 """
         val expectedAst = Program(listOf(
-                PrintStatement(AdditionExpression(StringLiteral("Hello "), VariableReference("name")), appendNewline = true),
-                PrintStatement(ToString(VariableReference("x")), appendNewline = false)
+                PrintStatement(AdditionExpression(StringLiteral("Hello "), VariableReference("name")), newline = true),
+                PrintStatement(ToString(VariableReference("x")), newline = false)
         ))
 
         assertEquals(expectedAst, ast(code))
@@ -367,7 +366,7 @@ int y = 1.5 + x;"""
                         ), pos(2, 0, 2, 16))
         ), pos(1, 0, 2, 16))
 
-        val ast = ast(code, setPosition = true)
+        val ast = ast(code, withPositions = true)
         assertEquals(expectedAst, ast)
     }
 

@@ -19,7 +19,7 @@ class AstNodeTest {
                 Assignment("x", ReadInt()),
                 Assignment("f", ReadDouble()),
                 Assignment("s", ReadLine()),
-                PrintStatement(VariableReference("s"), appendNewline = true),
+                PrintStatement(VariableReference("s"), newline = true),
                 ExitStatement()
         ))
 
