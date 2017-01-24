@@ -1,16 +1,17 @@
 package minic
 
+import minic.backend.codegen.jvm.JvmCodeGenerator
 import minic.frontend.antlr.MiniCLexer
 import minic.frontend.antlr.MiniCParser
 import minic.frontend.ast.AntlrToAstMapper
 import minic.frontend.ast.Point
-import minic.frontend.ast.Program
 import minic.frontend.validation.Error
 import minic.frontend.validation.validate
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.atn.PredictionMode
+import org.apache.commons.io.FilenameUtils
+import java.io.FileOutputStream
 import java.io.InputStream
-import java.util.*
 
 class Compiler(val diagnosticChecks: Boolean = false) {
 
@@ -30,13 +31,13 @@ class Compiler(val diagnosticChecks: Boolean = false) {
         }
 
         val lexer = MiniCLexer(input)
-        lexer.removeErrorListeners(); // remove ConsoleErrorListener
+        lexer.removeErrorListeners() // remove ConsoleErrorListener
         lexer.addErrorListener(errorListener)
 
         val tokens = CommonTokenStream(lexer)
 
         val parser = MiniCParser(tokens)
-        parser.removeErrorListeners(); // remove ConsoleErrorListener
+        parser.removeErrorListeners() // remove ConsoleErrorListener
         parser.addErrorListener(errorListener)
         if (diagnosticChecks) {
             parser.interpreter.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION
@@ -54,19 +55,32 @@ class Compiler(val diagnosticChecks: Boolean = false) {
         if (parsingResult.errors.any())
             return parsingResult.errors
 
-        val mapper = AntlrToAstMapper()
-        val ast = mapper.map(parsingResult.root)
+        val ast = AntlrToAstMapper().map(parsingResult.root)
 
         return ast.validate()
     }
 
-    fun compile(input: ANTLRInputStream) {
-        val parsingResult = parse(input)
-
+    private fun generateJvmBytecode(parsingResult: AntlrParsingResult, classNane: String) : JvmCodeGenerator {
         val errors = validate(parsingResult)
         if (errors.any())
             throw Exception(errors.joinToString())
 
+        val ast = AntlrToAstMapper().map(parsingResult.root)
 
+        return JvmCodeGenerator(ast, classNane, diagnosticChecks)
+    }
+
+    fun compile(input: String, outputFilePath: String) = compile(ANTLRInputStream(input), outputFilePath)
+    fun compile(input: InputStream, outputFilePath: String) = compile(ANTLRInputStream(input), outputFilePath)
+    fun compile(input: ANTLRInputStream, outputFilePath: String) = compile(parse(input), outputFilePath)
+
+    fun compile(parsingResult: AntlrParsingResult, outputFilePath: String) {
+        val className = FilenameUtils.removeExtension(FilenameUtils.getName(outputFilePath))
+
+        val  bytes = generateJvmBytecode(parsingResult, className).bytes
+
+        FileOutputStream(outputFilePath).use {
+            it.write(bytes)
+        }
     }
 }

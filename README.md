@@ -16,6 +16,8 @@ Run Maven `package` goal. This will download all dependencies, run JUnit tests a
 
 `dist/` folder will contain JAR file, .exe for Windows and shell script for Linux/MacOS (it simply executes the JAR file via `java`)
  
+ Some of the tests launch `java`, using path from `System.getProperty("java.home")`. Fallbacks to `java` (from PATH environment variable) if it is not found.
+ 
 #Usage
  
  1. `cd dist/minic-dist`
