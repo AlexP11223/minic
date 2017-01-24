@@ -7,9 +7,9 @@ import minic.frontend.ast.*
 // so for now I decided to use this simple and clear approach
 
 fun AstNode.processWithSymbols(scope: Scope,
-                               beforeSymbolOperation: (AstNode, Scope) -> Unit = ::emptyOp,
                                enterOperation: (AstNode, Scope) -> Unit = ::emptyOp,
-                               exitOperation: (AstNode, Scope) -> Unit = ::emptyOp) {
+                               exitOperation: (AstNode, Scope) -> Unit = ::emptyOp,
+                               beforeSymbolOperation: (AstNode, Scope) -> Unit = ::emptyOp) {
     var currentScope = scope
 
     beforeSymbolOperation(this, currentScope)
@@ -22,21 +22,21 @@ fun AstNode.processWithSymbols(scope: Scope,
     enterOperation(this, currentScope)
 
     children().forEach {
-        it.processWithSymbols(currentScope, beforeSymbolOperation, enterOperation, exitOperation)
+        it.processWithSymbols(currentScope, enterOperation, exitOperation, beforeSymbolOperation)
     }
 
     exitOperation(this, currentScope)
 }
 
-fun Program.processWithSymbols(beforeSymbolOperation: (AstNode, Scope) -> Unit = ::emptyOp,
-                               enterOperation: (AstNode, Scope) -> Unit = ::emptyOp,
-                               exitOperation: (AstNode, Scope) -> Unit = ::emptyOp)
-        = this.processWithSymbols(GlobalScope(), beforeSymbolOperation, enterOperation, exitOperation)
+fun Program.processWithSymbols(enterOperation: (AstNode, Scope) -> Unit = ::emptyOp,
+                               exitOperation: (AstNode, Scope) -> Unit = ::emptyOp,
+                               beforeSymbolOperation: (AstNode, Scope) -> Unit = ::emptyOp)
+        = this.processWithSymbols(GlobalScope(), enterOperation, exitOperation, beforeSymbolOperation)
 
 fun <T: AstNode> AstNode.processWithSymbols(scope: Scope, nodeClass: Class<T>,
-                                            beforeSymbolOperation: (T, Scope) -> Unit = ::emptyOp,
                                             enterOperation: (T, Scope) -> Unit = ::emptyOp,
-                                            exitOperation: (T, Scope) -> Unit = ::emptyOp) {
+                                            exitOperation: (T, Scope) -> Unit = ::emptyOp,
+                                            beforeSymbolOperation: (T, Scope) -> Unit = ::emptyOp) {
     processWithSymbols(scope, beforeSymbolOperation = { node, scope ->
         if (nodeClass.isInstance(node)) {
             beforeSymbolOperation(node as T, scope)
@@ -53,9 +53,9 @@ fun <T: AstNode> AstNode.processWithSymbols(scope: Scope, nodeClass: Class<T>,
 }
 
 fun <T: AstNode> Program.processWithSymbols(nodeClass: Class<T>,
-                                            beforeSymbolOperation: (T, Scope) -> Unit = ::emptyOp,
                                             enterOperation: (T, Scope) -> Unit = ::emptyOp,
-                                            exitOperation: (T, Scope) -> Unit = ::emptyOp)
-        = this.processWithSymbols(GlobalScope(), nodeClass, beforeSymbolOperation, enterOperation, exitOperation)
+                                            exitOperation: (T, Scope) -> Unit = ::emptyOp,
+                                            beforeSymbolOperation: (T, Scope) -> Unit = ::emptyOp)
+        = this.processWithSymbols(GlobalScope(), nodeClass, enterOperation, exitOperation, beforeSymbolOperation)
 
 private fun emptyOp(node: AstNode, scope: Scope) { }
