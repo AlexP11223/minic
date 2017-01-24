@@ -83,4 +83,12 @@ class Compiler(val diagnosticChecks: Boolean = false) {
             it.write(bytes)
         }
     }
+
+    fun execute(input: String) = execute(ANTLRInputStream(input))
+    fun execute(input: InputStream) = execute(ANTLRInputStream(input))
+    fun execute(input: ANTLRInputStream) = execute(parse(input))
+
+    fun execute(parsingResult: AntlrParsingResult) {
+        generateJvmBytecode(parsingResult, "MinicMain").execute()
+    }
 }

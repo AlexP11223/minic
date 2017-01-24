@@ -20,4 +20,9 @@ class CompilerTest {
         assertTrue(File(outputFilePath).exists(), "$outputFilePath doesn't exist")
         assertTrue(File(outputFilePath).length() > 0, "$outputFilePath is empty")
     }
+
+    @Test
+    fun executesWithoutFail() {
+        Compiler().execute("")
+    }
 }

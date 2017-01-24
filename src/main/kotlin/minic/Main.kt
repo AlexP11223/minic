@@ -1,6 +1,7 @@
 package minic
 
 import org.apache.commons.io.FilenameUtils
+import java.io.File
 import java.io.FileInputStream
 
 val compilerName = "minic"
@@ -31,6 +32,8 @@ fun main(args: Array<String>) {
     println("Mini-C compiler")
 
     var inputStream = System.`in`
+    var outputFilePath: String? = null
+    var executionMode = true
 
     if (args.count() > 0) {
         if (args.count() > 2) {
@@ -44,14 +47,21 @@ fun main(args: Array<String>) {
             return
         }
 
+        executionMode = false
+
         val inputFilePath = args[0]
 
-        var outputFilePath = if (args.count() > 1) args[1] else FilenameUtils.removeExtension(inputFilePath)
-        if (!outputFilePath.endsWith(".class"))
+        outputFilePath = if (args.count() > 1) args[1] else FilenameUtils.removeExtension(inputFilePath)
+        if (!outputFilePath!!.endsWith(".class"))
             outputFilePath += ".class"
 
         println("Input file: $inputFilePath")
         println("Output file: $outputFilePath")
+
+        if (!File(inputFilePath).isFile) {
+            println("File not found.")
+            return
+        }
 
         inputStream = FileInputStream(inputFilePath)
     } else {
@@ -72,5 +82,16 @@ fun main(args: Array<String>) {
         return
     }
 
-
+    try {
+        if (executionMode) {
+            compiler.execute(parsingResult)
+        } else {
+            compiler.compile(parsingResult, outputFilePath!!)
+        }
+    } catch (ex: Exception) {
+        println("Code generation error")
+        println(ex.message)
+        ex.printStackTrace()
+        return
+    }
 }
