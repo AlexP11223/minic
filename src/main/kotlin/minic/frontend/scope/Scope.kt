@@ -3,16 +3,24 @@ package minic.frontend.scope
 interface Scope {
     val parent: Scope?
 
-    // adds symbol to the scope
+    /**
+     * adds symbol to the scope
+     */
     fun define(symbol: Symbol)
 
-    // returns symbol if it exists in current or one of the parent scopes, or null
+    /**
+     * returns symbol if it exists in current or one of the parent scopes, or null
+     */
     fun resolve(name: String) : Symbol?
 
-    // symbols of the scope
+    /**
+     * returns symbols of the scope
+     */
     fun symbols() : List<Symbol>
 
-    // symbols of the scope including all parent scopes (starting from the deepest parent, that is global scope)
+    /**
+     * returns symbols of the scope including all parent scopes (starting from the deepest parent, that is from global scope)
+     */
     fun allSymbols() : List<Symbol>
 }
 

@@ -5,24 +5,28 @@ import minic.frontend.antlr.MiniCParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 
-// ANTLR parse tree mapping to AST
-
 fun Token.startPoint() = Point(line, charPositionInLine)
 fun Token.endPoint() = Point(line, charPositionInLine + (if (type != MiniCLexer.EOF) text.length else 0))
 
+/**
+ * @param withPositions if false, sets all nodes positions to null (used to simplify tests)
+ */
 class AntlrToAstMapper(val withPositions: Boolean = true) {
 
+    /**
+     * Maps ANTLR parse to AST
+     */
     fun map(antlrProgramContext: ProgramContext) : Program {
         return antlrProgramContext.toAst()
     }
 
-    fun ParserRuleContext.position() : Position? {
+    private fun ParserRuleContext.position() : Position? {
         return if (withPositions) Position(start.startPoint(), stop.endPoint()) else null
     }
 
-    fun ProgramContext.toAst() : Program = Program(this.statement().map { it.toAst() }, position())
+    private fun ProgramContext.toAst() : Program = Program(this.statement().map { it.toAst() }, position())
 
-    fun StatementContext.toAst(): Statement = when (this) {
+    private fun StatementContext.toAst(): Statement = when (this) {
         is BlockStatementContext -> StatementsBlock(block().statement().map { it.toAst() }, position())
         is IfStatementContext -> IfStatement(parExpression().expression().toAst(), ifBody.toAst(), elseBody?.toAst(), position())
         is WhileStatementContext -> WhileStatement(parExpression().expression().toAst(), statement().toAst(), position())
@@ -35,7 +39,7 @@ class AntlrToAstMapper(val withPositions: Boolean = true) {
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 
-    fun ExpressionContext.toAst(): Expression = when (this) {
+    private fun ExpressionContext.toAst(): Expression = when (this) {
         is LiteralExpressionContext -> literal().toAst()
         is BinaryOperationContext -> toAst()
         is UnaryOperationContext -> toAst()
@@ -48,7 +52,7 @@ class AntlrToAstMapper(val withPositions: Boolean = true) {
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 
-    fun LiteralContext.toAst(): Expression = when (this) {
+    private fun LiteralContext.toAst(): Expression = when (this) {
         is IntContext -> IntLiteral(text.toInt(), position())
         is FloatContext -> FloatLiteral(text.toDouble(), position())
         is BooleanContext -> BooleanLiteral(text.toBoolean(), position())
@@ -56,13 +60,13 @@ class AntlrToAstMapper(val withPositions: Boolean = true) {
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 
-    fun UnaryOperationContext.toAst(): Expression = when (op.type) {
+    private fun UnaryOperationContext.toAst(): Expression = when (op.type) {
         MiniCLexer.NOT -> NotExpression(expression().toAst(), position())
         MiniCLexer.MINUS -> UnaryMinusExpression(expression().toAst(), position())
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 
-    fun BinaryOperationContext.toAst(): BinaryExpression = when (op.type) {
+    private fun BinaryOperationContext.toAst(): BinaryExpression = when (op.type) {
         MiniCLexer.PLUS -> AdditionExpression(left.toAst(), right.toAst(), position())
         MiniCLexer.MINUS -> SubtractionExpression(left.toAst(), right.toAst(), position())
         MiniCLexer.MUL -> MultiplicationExpression(left.toAst(), right.toAst(), position())
@@ -82,7 +86,7 @@ class AntlrToAstMapper(val withPositions: Boolean = true) {
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 
-    fun TypeContext.toAst(): TypeNode = when (this) {
+    private fun TypeContext.toAst(): TypeNode = when (this) {
         is IntTypeContext -> IntTypeNode(position())
         is DoubleTypeContext -> DoubleTypeNode(position())
         is BooleanTypeContext -> BoolTypeNode(position())

@@ -73,7 +73,9 @@ private val promoteFromTo: List<List<Type?>> =
                 /* double */  listOf(null,        null,        null,        null)
         )
 
-// promotes type if needed. Returns the same type if promotion not needed or not possible
+/**
+ * Promotes type if needed. Returns the same type if promotion not needed or not possible
+ */
 fun Type.promoteTo(resultType: Type) : Type {
     return promoteFromTo[this.index][resultType.index] ?: this
 }
@@ -82,8 +84,11 @@ fun Type.canPromoteTo(resultType: Type) : Boolean {
     return this.promoteTo(resultType) == resultType
 }
 
-// returns result type of expression
-// throws exception if undefined variable found or incompatible expressions found
+/**
+ * Returns result type of expression
+ * @throws UndefinedSymbolException if encountered undefined variable
+ * @throws IllegalExpressionException if incompatible expressions found
+ */
 fun Expression.type(scope: Scope) : Type {
     return when (this) {
         is IntLiteral -> IntType
