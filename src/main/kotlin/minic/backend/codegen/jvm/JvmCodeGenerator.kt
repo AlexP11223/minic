@@ -7,7 +7,9 @@ import minic.frontend.type.BoolType
 import minic.frontend.type.DoubleType
 import minic.frontend.type.IntType
 import minic.frontend.type.StringType
+import minic.frontend.type.Type
 import org.objectweb.asm.*
+import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
 
 class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", val diagnosticChecks: Boolean = false) {
@@ -112,6 +114,9 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
         }
     }
 
+    /**
+     * Pushes expression to stack
+     */
     private fun Expression.push(scope: Scope, mv: MethodVisitor) {
         when (this) {
             is IntLiteral -> mv.visitLdcInsn(value)
@@ -129,7 +134,99 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                     else -> throw UnsupportedOperationException(argType.javaClass.canonicalName)
                 }
             }
+            is UnaryMinusExpression -> {
+                value.push(scope, mv)
+                val valueType = value.type(scope)
+                when (valueType) {
+                    IntType -> mv.visitInsn(Opcodes.INEG)
+                    DoubleType -> mv.visitInsn(Opcodes.DNEG)
+                    else -> throw UnsupportedOperationException(valueType.javaClass.canonicalName)
+                }
+            }
+            is BinaryExpression -> {
+                // promote types if needed (such as int to double)
+                val leftType = left.type(scope).promoteTo(right.type(scope))
+                val rightType = left.type(scope).promoteTo(leftType)
+                if (leftType != rightType)
+                    throw UnsupportedOperationException("${leftType.name} and ${rightType.name}")
+
+                when (this) {
+                    is AdditionExpression -> {
+                        if (leftType == StringType) { // assuming that it was already validated and string concatenation allowed only if both strings
+                            mv.visitTypeInsn(NEW, "java/lang/StringBuilder")
+                            mv.visitInsn(DUP)
+                            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false)
+                            left.push(scope, mv)
+                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false)
+                            right.push(scope, mv)
+                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false)
+                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false)
+                        } else {
+                            left.pushAs(leftType, scope, mv)
+                            right.pushAs(rightType, scope, mv)
+                            val exprType = leftType
+                            when (exprType) {
+                                IntType -> mv.visitInsn(IADD)
+                                DoubleType -> mv.visitInsn(DADD)
+                                else -> throw UnsupportedOperationException("${this.javaClass.canonicalName} and ${exprType.name}")
+                            }
+                        }
+                    }
+                    is SubtractionExpression,
+                    is MultiplicationExpression,
+                    is DivisionExpression,
+                    is ModExpression -> {
+                        left.pushAs(leftType, scope, mv)
+                        right.pushAs(rightType, scope, mv)
+                        val exprType = leftType
+                        when (this) {
+                            is SubtractionExpression -> {
+                                when (exprType) {
+                                    IntType -> mv.visitInsn(ISUB)
+                                    DoubleType -> mv.visitInsn(DSUB)
+                                }
+                            }
+                            is MultiplicationExpression -> {
+                                when (exprType) {
+                                    IntType -> mv.visitInsn(IMUL)
+                                    DoubleType -> mv.visitInsn(DMUL)
+                                }
+                            }
+                            is DivisionExpression -> {
+                                when (exprType) {
+                                    IntType -> mv.visitInsn(IDIV)
+                                    DoubleType -> mv.visitInsn(DDIV)
+                                }
+                            }
+                            is ModExpression -> {
+                                when (exprType) {
+                                    IntType -> mv.visitInsn(IREM)
+                                    DoubleType -> mv.visitInsn(DREM)
+                                }
+                            }
+                        }
+
+                    }
+                    else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
+                }
+            }
             else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
+        }
+    }
+
+    /**
+     * Pushes expression to stack and converts it to resultType if needed and possible
+     * @throws UnsupportedOperationException if cannot convert
+     */
+    private fun Expression.pushAs(resultType: Type, scope: Scope, mv: MethodVisitor) {
+        this.push(scope, mv)
+        val currentType = this.type(scope)
+        if (currentType != resultType) {
+            if (currentType == IntType && resultType == DoubleType) {
+                mv.visitInsn(I2D)
+            } else {
+                throw UnsupportedOperationException("Cannot convert ${currentType.name} to ${resultType.name}")
+            }
         }
     }
 }

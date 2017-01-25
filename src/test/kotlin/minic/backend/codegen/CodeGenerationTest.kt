@@ -70,4 +70,54 @@ false
         assertEquals(expectedOutput, compileAndRun(code))
     }
 
+    @Test
+    fun concatenatesStrings() {
+        val code = """
+println("Hello " + "world!");
+println("Hello" + " " + "world.");
+"""
+        val expectedOutput = """
+Hello world!
+Hello world.
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
+    fun calculatesUnaryMinus() {
+        val code = """
+println(toString( -42 ));
+println(toString( -42.5 ));
+println(toString( --42.5 ));
+println(toString( -(--42) ));
+"""
+        val expectedOutput = """
+-42
+-42.5
+42.5
+-42
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
+    fun calculatesArithmeticExpressions() {
+        val code = """
+println(toString( 2 + 2 * 2 ));
+println(toString( 4.5 * 2 ));
+println(toString(  1 + 2 * 3/4.0 - (5 + 6 * 7 * (-8 - 9)) ));
+println(toString( 8 % 2 ));
+println(toString( 9 % 2 ));
+println(toString( 9.5 % 2 ));
+"""
+        val expectedOutput = """
+6
+9.0
+711.5
+0
+1
+1.5
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
 }
