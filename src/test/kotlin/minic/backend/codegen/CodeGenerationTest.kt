@@ -109,6 +109,10 @@ println(toString(  1 + 2 * 3/4.0 - (5 + 6 * 7 * (-8 - 9)) ));
 println(toString( 8 % 2 ));
 println(toString( 9 % 2 ));
 println(toString( 9.5 % 2 ));
+int a = 2;
+println(toString( 2 + a * 2 ));
+double b = 2.0;
+println(toString( 2 + b * 2 ));
 """
         val expectedOutput = """
 6
@@ -117,6 +121,62 @@ println(toString( 9.5 % 2 ));
 0
 1
 1.5
+6
+6.0
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
+    fun handlesVariables() {
+        val code = """
+int a = 0;
+{
+    double b = 1.0;
+    int c = 2;
+    string d = "hello";
+    {
+        double e = 4.5;
+        int f = 5;
+
+        println(toString(b));
+        println(toString(c));
+        println(d);
+        println(toString(e));
+        println(toString(f));
+    }
+    c = 42;
+    int e = a + 6;
+
+    println(toString(e));
+    println(toString(c));
+}
+int b = 7;
+double c = 8;
+{
+    int d = 9;
+    println(toString(d));
+}
+bool e = true;
+
+println(toString(a));
+println(toString(b));
+println(toString(c));
+println(toString(e));
+"""
+        val expectedOutput = """
+1.0
+2
+hello
+4.5
+5
+6
+42
+9
+0
+7
+8.0
+true
 """.trim()
         assertEquals(expectedOutput, compileAndRun(code))
     }

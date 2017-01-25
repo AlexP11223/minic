@@ -13,6 +13,9 @@ import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
 
 class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", val diagnosticChecks: Boolean = false) {
+    private var nextVarIndex = 0
+    private val varIndexMap = mutableMapOf<String, Int>()
+
     /**
      * JVM bytecode. Can be saved to a .class file, executed, etc.
      */
@@ -93,13 +96,42 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
     }
 
     private fun writeProgramCode(mv: MethodVisitor) {
-        ast.processWithSymbols(Statement::class.java) { statement, scope ->
+        ast.processWithSymbols(Statement::class.java, exitOperation = { statement, scope ->
             when (statement) {
                 is VariableDeclaration -> {
+                    // TODO: should be optimized to reuse indexes when left scope
+                    val symbol = scope.resolve(statement.variableName)!!
+                    val index = nextVarIndex
 
+                    varIndexMap[statement.variableName] = index
+
+                    nextVarIndex += when (symbol.type) {
+                        IntType, BoolType, StringType -> 1
+                        DoubleType -> 2
+                        else -> throw UnsupportedOperationException("Declaration of ${symbol.type.name}")
+                    }
+
+                    statement.value.pushAs(symbol.type, scope, mv)
+
+                    when (symbol.type) {
+                        IntType, BoolType -> mv.visitVarInsn(ISTORE, index)
+                        DoubleType -> mv.visitVarInsn(DSTORE, index)
+                        StringType -> mv.visitVarInsn(ASTORE, index)
+                        else -> throw UnsupportedOperationException("Declaration of ${symbol.type.name}")
+                    }
                 }
                 is Assignment -> {
+                    val symbol = scope.resolve(statement.variableName)!!
+                    val index = varIndexMap[statement.variableName]!!
 
+                    statement.value.pushAs(symbol.type, scope, mv)
+
+                    when (symbol.type) {
+                        IntType, BoolType -> mv.visitVarInsn(ISTORE, index)
+                        DoubleType -> mv.visitVarInsn(DSTORE, index)
+                        StringType -> mv.visitVarInsn(ASTORE, index)
+                        else -> throw UnsupportedOperationException(symbol.type.name)
+                    }
                 }
                 is PrintStatement -> {
                     mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
@@ -111,7 +143,7 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                 is StatementsBlock -> { /* no need to do anything, process() already visits all children */ }
                 else -> throw UnsupportedOperationException(statement.javaClass.canonicalName)
             }
-        }
+        })
     }
 
     /**
@@ -123,6 +155,16 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
             is FloatLiteral -> mv.visitLdcInsn(value)
             is StringLiteral -> mv.visitLdcInsn(value)
             is BooleanLiteral -> mv.visitLdcInsn(if (value) 1 else 0)
+            is VariableReference -> {
+                val symbol = scope.resolve(variableName)!!
+                val index = varIndexMap[variableName]!!
+                when (symbol.type) {
+                    IntType, BoolType -> mv.visitVarInsn(ILOAD, index)
+                    DoubleType -> mv.visitVarInsn(DLOAD, index)
+                    StringType -> mv.visitVarInsn(ALOAD, index)
+                    else -> throw UnsupportedOperationException(symbol.type.name)
+                }
+            }
             is ToString -> {
                 value.push(scope, mv)
                 val argType = value.type(scope)
