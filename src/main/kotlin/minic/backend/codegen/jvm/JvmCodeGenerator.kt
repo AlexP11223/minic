@@ -37,7 +37,7 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
     private fun compile(): ByteArray {
         val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
         val cv = if (diagnosticChecks) CheckClassAdapter(classWriter, true) else classWriter
-        cv.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, className, null, "java/lang/Object", null)
+        cv.visit(V1_8, ACC_PUBLIC, className, null, "java/lang/Object", null)
 
         writeInitMethod(cv)
 
@@ -51,29 +51,29 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
 
     // constructor without parameters, also calls Java Object constructor
     private fun writeInitMethod(cv: ClassVisitor) {
-        writeMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", cv) { mv ->
-            mv.visitVarInsn(Opcodes.ALOAD, 0)
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
-            mv.visitInsn(Opcodes.RETURN)
+        writeMethod(ACC_PUBLIC, "<init>", "()V", cv) { mv ->
+            mv.visitVarInsn(ALOAD, 0)
+            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
+            mv.visitInsn(RETURN)
         }
     }
 
     // non-static execute() method with Mini-C program code
     private fun writeProgramExecutionMethod(cv: ClassVisitor) {
-        writeMethod(Opcodes.ACC_PUBLIC, "execute", "()V", cv) { mv ->
+        writeMethod(ACC_PUBLIC, "execute", "()V", cv) { mv ->
             writeProgramCode(mv)
 
-            mv.visitInsn(Opcodes.RETURN)
+            mv.visitInsn(RETURN)
         }
     }
 
     // static main method. Creates class instance and calls execute() method
     private fun writeMainMethod(cv: ClassVisitor) {
-        writeMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, "main", "([Ljava/lang/String;)V", cv) { mv ->
-            mv.visitTypeInsn(Opcodes.NEW, className)
-            mv.visitInsn(Opcodes.DUP)
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, className, "<init>", "()V", false)
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className, "execute", "()V", false)
+        writeMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", cv) { mv ->
+            mv.visitTypeInsn(NEW, className)
+            mv.visitInsn(DUP)
+            mv.visitMethodInsn(INVOKESPECIAL, className, "<init>", "()V", false)
+            mv.visitMethodInsn(INVOKEVIRTUAL, className, "execute", "()V", false)
         }
     }
 
@@ -83,7 +83,7 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
 
         writeCode(mv)
 
-        mv.visitInsn(Opcodes.RETURN)
+        mv.visitInsn(RETURN)
 
         // computed automatically because COMPUTE_MAXS option used.
         // but looks like CheckClassAdapter doesn't work without valid values
@@ -102,10 +102,10 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
 
                 }
                 is PrintStatement -> {
-                    mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
+                    mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
                     statement.value.push(scope, mv)
                     val printFunc = if (statement.newline) "println" else "print"
-                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", printFunc, "(Ljava/lang/String;)V", false)
+                    mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", printFunc, "(Ljava/lang/String;)V", false)
 
                 }
                 is StatementsBlock -> { /* no need to do anything, process() already visits all children */ }
@@ -127,9 +127,9 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                 value.push(scope, mv)
                 val argType = value.type(scope)
                 when (argType) {
-                    IntType -> mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "toString", "(I)Ljava/lang/String;", false)
-                    DoubleType -> mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Double", "toString", "(D)Ljava/lang/String;", false)
-                    BoolType -> mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "toString", "(Z)Ljava/lang/String;", false)
+                    IntType -> mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "toString", "(I)Ljava/lang/String;", false)
+                    DoubleType -> mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "toString", "(D)Ljava/lang/String;", false)
+                    BoolType -> mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "toString", "(Z)Ljava/lang/String;", false)
                     StringType -> { /* do nothing, already have string on the stack */ }
                     else -> throw UnsupportedOperationException(argType.javaClass.canonicalName)
                 }
@@ -138,8 +138,8 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                 value.push(scope, mv)
                 val valueType = value.type(scope)
                 when (valueType) {
-                    IntType -> mv.visitInsn(Opcodes.INEG)
-                    DoubleType -> mv.visitInsn(Opcodes.DNEG)
+                    IntType -> mv.visitInsn(INEG)
+                    DoubleType -> mv.visitInsn(DNEG)
                     else -> throw UnsupportedOperationException(valueType.javaClass.canonicalName)
                 }
             }
