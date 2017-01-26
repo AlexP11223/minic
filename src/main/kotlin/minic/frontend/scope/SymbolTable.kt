@@ -6,6 +6,13 @@ import minic.frontend.ast.*
 // but it doesn't matter for simple languages like this, and it is not too computational-heavy operation anyway,
 // so for now I decided to use this simple and clear approach
 
+/**
+ * Visits this node and all children nodes, builds scopes.
+ * It adds new variables to the current scope when encountering declarations, pushes new scope when entering blocks
+ * and pops the current scope when leaving blocks.
+ * For each node calls beforeSymbolOperation before any scope manipulations (always, even when nothing will change),
+ * enterOperation before visiting its children, and exitOperation after. All operations receive the node and scope as parameters.
+ */
 fun AstNode.processWithSymbols(scope: Scope,
                                beforeSymbolOperation: (AstNode, Scope) -> Unit = ::emptyOp,
                                enterOperation: (AstNode, Scope) -> Unit = ::emptyOp,
@@ -28,11 +35,17 @@ fun AstNode.processWithSymbols(scope: Scope,
     exitOperation(this, currentScope)
 }
 
+/**
+ * Starting point for [processWithSymbols], starts with empty global scope.
+ */
 fun Program.processWithSymbols(beforeSymbolOperation: (AstNode, Scope) -> Unit = ::emptyOp,
                                enterOperation: (AstNode, Scope) -> Unit = ::emptyOp,
                                exitOperation: (AstNode, Scope) -> Unit = ::emptyOp)
         = this.processWithSymbols(GlobalScope(), beforeSymbolOperation, enterOperation, exitOperation)
 
+/**
+ * The same as [processWithSymbols] but calls operations only if node is instance of the specified nodeClass
+ */
 fun <T: AstNode> AstNode.processWithSymbols(scope: Scope, nodeClass: Class<T>,
                                             beforeSymbolOperation: (T, Scope) -> Unit = ::emptyOp,
                                             enterOperation: (T, Scope) -> Unit = ::emptyOp,
@@ -52,6 +65,9 @@ fun <T: AstNode> AstNode.processWithSymbols(scope: Scope, nodeClass: Class<T>,
     })
 }
 
+/**
+ * Starting point for [processWithSymbols], starts with empty global scope.
+ */
 fun <T: AstNode> Program.processWithSymbols(nodeClass: Class<T>,
                                             beforeSymbolOperation: (T, Scope) -> Unit = ::emptyOp,
                                             enterOperation: (T, Scope) -> Unit = ::emptyOp,

@@ -13,6 +13,9 @@ import org.apache.commons.io.FilenameUtils
 import java.io.FileOutputStream
 import java.io.InputStream
 
+/**
+ * @param diagnosticChecks Enables additional checks during parsing (ambiguity, ...) and code generation (bytecode correctness).
+ */
 class Compiler(val diagnosticChecks: Boolean = false) {
 
     data class AntlrParsingResult(val root: MiniCParser.ProgramContext, val errors: List<Error>)
@@ -51,6 +54,9 @@ class Compiler(val diagnosticChecks: Boolean = false) {
     fun validate(input: InputStream) : List<Error> = validate(ANTLRInputStream(input))
     fun validate(input: ANTLRInputStream) : List<Error> = validate(parse(input))
 
+    /**
+     * Returns list of errors (syntax or semantic), or empty list if there are no errors
+     */
     fun validate(parsingResult: AntlrParsingResult) : List<Error> {
         if (parsingResult.errors.any())
             return parsingResult.errors
@@ -88,6 +94,9 @@ class Compiler(val diagnosticChecks: Boolean = false) {
     fun execute(input: InputStream) = execute(ANTLRInputStream(input))
     fun execute(input: ANTLRInputStream) = execute(parse(input))
 
+    /**
+     * Executes program in current thread
+     */
     fun execute(parsingResult: AntlrParsingResult) {
         generateJvmBytecode(parsingResult, "MinicMain").execute()
     }

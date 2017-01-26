@@ -14,6 +14,11 @@ import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
 import java.lang.reflect.InvocationTargetException
 
+/**
+ * @param className Name of produced JVM class. Should be the same as name of .class file,
+ *                  does not matter if not saved to a file to be executed by java.
+ * @param diagnosticChecks Enables additional checks during code generation (bytecode correctness).
+ */
 class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", val diagnosticChecks: Boolean = false) {
     private var nextVarIndex = 1
     private val varIndexMap = mutableMapOf<String, Int>()

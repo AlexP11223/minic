@@ -6,6 +6,9 @@ import minic.frontend.ast.*
 import minic.frontend.scope.*
 import minic.frontend.type.*
 
+/**
+ * Returns list of errors (only semantic), or empty list if there are no errors
+ */
 fun Program.validate() : List<Error> {
     val errors = mutableListOf<Error>()
 
