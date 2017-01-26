@@ -1,5 +1,6 @@
 package minic.backend.codegen.jvm
 
+import minic.backend.ExecutionRuntimeException
 import minic.frontend.ast.*
 import minic.frontend.scope.Scope
 import minic.frontend.scope.processWithSymbols
@@ -11,6 +12,7 @@ import minic.frontend.type.Type
 import org.objectweb.asm.*
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
+import java.lang.reflect.InvocationTargetException
 
 class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", val diagnosticChecks: Boolean = false) {
     private var nextVarIndex = 0
@@ -34,7 +36,16 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
         val inst = programClass.newInstance()
         // better approach would be to implement interface and cast to it
         // but it is more complicated to generate so for now just calling it using reflection
-        programClass.getMethod("execute").invoke(inst)
+        try {
+            programClass.getMethod("execute").invoke(inst)
+        } catch (ex: InvocationTargetException) {
+            if (ex.targetException != null) {
+                throw ExecutionRuntimeException(ex.targetException.message, ex.targetException)
+            }
+            throw ExecutionRuntimeException(ex.message, ex)
+        } catch (ex: Exception) {
+            throw ExecutionRuntimeException(ex.message, ex)
+        }
     }
 
     private fun compile(): ByteArray {

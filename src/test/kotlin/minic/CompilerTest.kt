@@ -1,5 +1,6 @@
 package minic
 
+import minic.backend.ExecutionRuntimeException
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -24,5 +25,10 @@ class CompilerTest {
     @Test
     fun executesWithoutFail() {
         Compiler().execute("")
+    }
+
+    @Test(expected = ExecutionRuntimeException::class)
+    fun throwsWhenExecutionRuntimeError() {
+        Compiler().execute("int a = 1/0;")
     }
 }
