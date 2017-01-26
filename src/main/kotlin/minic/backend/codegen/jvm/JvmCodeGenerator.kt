@@ -15,7 +15,7 @@ import org.objectweb.asm.util.CheckClassAdapter
 import java.lang.reflect.InvocationTargetException
 
 class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", val diagnosticChecks: Boolean = false) {
-    private var nextVarIndex = 0
+    private var nextVarIndex = 1
     private val varIndexMap = mutableMapOf<String, Int>()
 
     /**
