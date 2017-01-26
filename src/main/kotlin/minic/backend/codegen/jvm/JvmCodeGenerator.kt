@@ -140,6 +140,10 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                     mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", printFunc, "(Ljava/lang/String;)V", false)
 
                 }
+                is ExitStatement -> {
+                    mv.visitInsn(ICONST_0)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "exit", "(I)V", false)
+                }
                 is StatementsBlock -> { /* no need to do anything, process() already visits all children */ }
                 else -> throw UnsupportedOperationException(statement.javaClass.canonicalName)
             }

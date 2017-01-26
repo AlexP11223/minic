@@ -201,4 +201,17 @@ true
 """.trim()
         assertEquals(expectedOutput, compileAndRun(code))
     }
+
+    @Test
+    fun exitStatementWorks() {
+        val code = """
+println("Hello");
+exit();
+println("unreachable");
+"""
+        val expectedOutput = """
+Hello
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
 }
