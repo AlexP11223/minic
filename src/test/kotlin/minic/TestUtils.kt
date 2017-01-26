@@ -2,6 +2,7 @@ package minic
 
 import org.apache.commons.io.IOUtils
 import java.io.File
+import java.io.OutputStreamWriter
 import java.nio.charset.Charset
 
 class JavaTestUtils {
@@ -25,13 +26,19 @@ class ProcessTestUtils {
          * runs the specified program (with args and optionally setting the working dir)
          * and returns output (stdout + stderr)
          */
-        fun run(program: String, args: String, workingDir: String? = null): String {
+        fun run(program: String, args: String, workingDir: String? = null, input: String? = null): String {
             val pb = ProcessBuilder(program, args)
             if (workingDir != null) {
                 pb.directory(File(workingDir))
             }
             pb.redirectErrorStream(true)
             val process = pb.start()
+            if (input != null) {
+                with(OutputStreamWriter(process.outputStream)) {
+                    write(input)
+                    flush()
+                }
+            }
             val output = IOUtils.toString(process.inputStream, Charset.defaultCharset())
             return output.replace("\r", "").trim()
         }

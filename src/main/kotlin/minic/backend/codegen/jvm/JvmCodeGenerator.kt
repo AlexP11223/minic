@@ -18,6 +18,8 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
     private var nextVarIndex = 1
     private val varIndexMap = mutableMapOf<String, Int>()
 
+    private var lastInputFuncType: InputFunction? = null
+
     /**
      * JVM bytecode. Can be saved to a .class file, executed, etc.
      */
@@ -63,11 +65,34 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
         return classWriter.toByteArray()
     }
 
-    // constructor without parameters, also calls Java Object constructor
+    private fun hasReadOperations(): Boolean {
+        var result = false
+        ast.process {
+            if (it is InputFunction) {
+                result = true
+            }
+        }
+        return result
+    }
+
+    // constructor without parameters, calls Java Object constructor and creates Scanner if needed
     private fun writeInitMethod(cv: ClassVisitor) {
         writeMethod(ACC_PUBLIC, "<init>", "()V", cv) { mv ->
             mv.visitVarInsn(ALOAD, 0)
             mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
+
+            if (hasReadOperations()) {
+                cv.visitField(ACC_PRIVATE + ACC_FINAL, "scanner", "Ljava/util/Scanner;", null, null).visitEnd()
+                mv.visitVarInsn(ALOAD, 0)
+                mv.visitTypeInsn(NEW, "java/util/Scanner")
+                mv.visitInsn(DUP)
+                mv.visitFieldInsn(GETSTATIC, "java/lang/System", "in", "Ljava/io/InputStream;")
+                mv.visitMethodInsn(INVOKESPECIAL, "java/util/Scanner", "<init>", "(Ljava/io/InputStream;)V", false)
+                mv.visitFieldInsn(GETSTATIC, "java/util/Locale", "US", "Ljava/util/Locale;")
+                mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Scanner", "useLocale", "(Ljava/util/Locale;)Ljava/util/Scanner;", false)
+                mv.visitFieldInsn(PUTFIELD, className, "scanner", "Ljava/util/Scanner;")
+            }
+
             mv.visitInsn(RETURN)
         }
     }
@@ -190,6 +215,32 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                     StringType -> { /* do nothing, already have string on the stack */ }
                     else -> throw UnsupportedOperationException(argType.javaClass.canonicalName)
                 }
+            }
+            is InputFunction -> {
+                mv.visitVarInsn(ALOAD, 0)
+                mv.visitFieldInsn(GETFIELD, className, "scanner", "Ljava/util/Scanner;")
+                when (this) {
+                    is ReadInt -> mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Scanner", "nextInt", "()I", false)
+                    is ReadDouble -> mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Scanner", "nextDouble", "()D", false)
+                    is ReadLine -> {
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Scanner", "nextLine", "()Ljava/lang/String;", false)
+
+                        // skip newline that was not consumed by nextInt/nextDouble to avoid confusing behavior
+                        if (lastInputFuncType != null && lastInputFuncType !is ReadLine && this is ReadLine) {
+                            mv.visitInsn(DUP)
+                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "isEmpty", "()Z", false)
+                            val lblEnd = Label()
+                            mv.visitJumpInsn(IFEQ, lblEnd)
+                            mv.visitInsn(POP)
+                            mv.visitVarInsn(ALOAD, 0)
+                            mv.visitFieldInsn(GETFIELD, className, "scanner", "Ljava/util/Scanner;")
+                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Scanner", "nextLine", "()Ljava/lang/String;", false)
+                            mv.visitLabel(lblEnd)
+                        }
+                    }
+                    else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
+                }
+                lastInputFuncType = this
             }
             is UnaryMinusExpression -> {
                 value.push(scope, mv)

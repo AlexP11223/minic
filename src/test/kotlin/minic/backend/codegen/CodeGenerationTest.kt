@@ -14,12 +14,12 @@ class CodeGenerationTest {
     @JvmField
     val tmpFolder = TemporaryFolder()
 
-    private fun run(programPath: String): String {
+    private fun run(programPath: String, input: String? = null): String {
         return ProcessTestUtils.run(JavaTestUtils.javaPath, args = FilenameUtils.getBaseName(programPath),
-                workingDir = FilenameUtils.getFullPath(programPath))
+                workingDir = FilenameUtils.getFullPath(programPath), input = input)
     }
 
-    private fun compileAndRun(code: String): String {
+    private fun compileAndRun(code: String, input: String? = null): String {
         val outputFilePath = tmpFolder.root.absolutePath + "/Program${System.currentTimeMillis()}_${code.length}.class"
 
         Compiler(diagnosticChecks = true).compile(code, outputFilePath)
@@ -27,7 +27,7 @@ class CodeGenerationTest {
         assertTrue(File(outputFilePath).exists(), "$outputFilePath doesn't exist")
         assertTrue(File(outputFilePath).length() > 0, "$outputFilePath is empty")
 
-        return run(outputFilePath)
+        return run(outputFilePath, input)
     }
 
     @Test
@@ -213,5 +213,40 @@ println("unreachable");
 Hello
 """.trim()
         assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test(timeout = 2000)
+    fun readsInput() {
+        val code = """
+print("Enter int: ");
+int a = readInt();
+print("Enter double: ");
+double b = readDouble();
+print("Enter line: ");
+string c = readLine();
+println("");
+println("a = " + toString(a));
+println("b = " + toString(b));
+println("c = " + c);
+
+a = readInt();
+c = readLine();
+println(toString(a) + "," + c);
+"""
+        val input = """
+42
+42.5
+Hello world
+1 str
+""".trimStart()
+        val expectedOutput = ("""
+Enter int: Enter double: Enter line: """ +
+"""
+a = 42
+b = 42.5
+c = Hello world
+1, str
+""").trim()
+        assertEquals(expectedOutput, compileAndRun(code, input = input))
     }
 }
