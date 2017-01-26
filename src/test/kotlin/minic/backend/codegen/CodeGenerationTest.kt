@@ -128,6 +128,27 @@ println(toString( 2 + b * 2 ));
     }
 
     @Test
+    fun calculatesLogicalExpressions() {
+        val code = """
+bool a = true;
+bool b = false;
+println(toString( a && a ) + " " + toString( a && b ) + " " + toString( b && a ) + " " + toString( b && b ));
+println(toString( a || a ) + " " + toString( a || b ) + " " + toString( b || a ) + " " + toString( b || b ));
+println(toString( !a ) + " " + toString( !b ) + " " + toString( !!a ));
+println(toString( a && (a || b) ));
+println(toString( a && (!a || b) ));
+"""
+        val expectedOutput = """
+true false false false
+true true true false
+false true true
+true
+false
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
     fun handlesVariables() {
         val code = """
 int a = 0;

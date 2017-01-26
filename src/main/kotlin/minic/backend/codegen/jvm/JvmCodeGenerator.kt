@@ -185,6 +185,17 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                     else -> throw UnsupportedOperationException(valueType.javaClass.canonicalName)
                 }
             }
+            is NotExpression -> {
+                expr.pushAs(BoolType, scope, mv)
+                val lblBeforeFalse = Label()
+                mv.visitJumpInsn(IFNE, lblBeforeFalse)
+                mv.visitInsn(ICONST_1)
+                val lblEnd = Label()
+                mv.visitJumpInsn(GOTO, lblEnd)
+                mv.visitLabel(lblBeforeFalse)
+                mv.visitInsn(ICONST_0)
+                mv.visitLabel(lblEnd)
+            }
             is BinaryExpression -> {
                 // promote types if needed (such as int to double)
                 val leftType = left.type(scope).promoteTo(right.type(scope))
@@ -247,7 +258,17 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                                 }
                             }
                         }
-
+                    }
+                    // TODO: implement logical and/or instead of bitwise
+                    is AndExpression -> {
+                        left.pushAs(BoolType, scope, mv)
+                        right.pushAs(BoolType, scope, mv)
+                        mv.visitInsn(IAND)
+                    }
+                    is OrExpression -> {
+                        left.pushAs(BoolType, scope, mv)
+                        right.pushAs(BoolType, scope, mv)
+                        mv.visitInsn(IOR)
                     }
                     else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
                 }
