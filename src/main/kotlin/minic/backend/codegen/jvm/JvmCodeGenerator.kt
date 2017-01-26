@@ -258,14 +258,7 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
             }
             is NotExpression -> {
                 expr.pushAs(BoolType, scope, mv)
-                val lblBeforeFalse = Label()
-                mv.visitJumpInsn(IFNE, lblBeforeFalse)
-                mv.visitInsn(ICONST_1)
-                val lblEnd = Label()
-                mv.visitJumpInsn(GOTO, lblEnd)
-                mv.visitLabel(lblBeforeFalse)
-                mv.visitInsn(ICONST_0)
-                mv.visitLabel(lblEnd)
+                pushNot(mv)
             }
             is BinaryExpression -> {
                 // promote types if needed (such as int to double)
@@ -341,6 +334,46 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                         right.pushAs(BoolType, scope, mv)
                         mv.visitInsn(IOR)
                     }
+                    is EqualityExpression -> {
+                        left.pushAs(leftType, scope, mv)
+                        right.pushAs(rightType, scope, mv)
+                        val type = leftType
+                        when (type) {
+                            StringType -> {
+                                mv.visitMethodInsn(INVOKESTATIC, "java/util/Objects", "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z", false)
+                                if (this is NotEqualExpression) {
+                                    // !equals(...)
+                                    pushNot(mv)
+                                }
+                            }
+                            else -> {
+                                if (type == DoubleType) {
+                                    mv.visitInsn(DCMPL)
+                                }
+                                val comparisonOpcode = when (type) {
+                                    IntType, BoolType -> when (this) {
+                                        is EqualExpression -> IF_ICMPNE
+                                        is NotEqualExpression -> IF_ICMPEQ
+                                        else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
+                                    }
+                                    DoubleType ->  when (this) {
+                                        is EqualExpression -> IFNE
+                                        is NotEqualExpression -> IFEQ
+                                        else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
+                                    }
+                                    else -> throw UnsupportedOperationException(type.name)
+                                }
+                                val lblBeforeFalse = Label()
+                                mv.visitJumpInsn(comparisonOpcode, lblBeforeFalse)
+                                mv.visitInsn(ICONST_1)
+                                val lblEnd = Label()
+                                mv.visitJumpInsn(GOTO, lblEnd)
+                                mv.visitLabel(lblBeforeFalse)
+                                mv.visitInsn(ICONST_0)
+                                mv.visitLabel(lblEnd)
+                            }
+                        }
+                    }
                     else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
                 }
             }
@@ -362,5 +395,16 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                 throw UnsupportedOperationException("Cannot convert ${currentType.name} to ${resultType.name}")
             }
         }
+    }
+
+    private fun pushNot(mv: MethodVisitor) {
+        val lblBeforeFalse = Label()
+        mv.visitJumpInsn(IFNE, lblBeforeFalse)
+        mv.visitInsn(ICONST_1)
+        val lblEnd = Label()
+        mv.visitJumpInsn(GOTO, lblEnd)
+        mv.visitLabel(lblBeforeFalse)
+        mv.visitInsn(ICONST_0)
+        mv.visitLabel(lblEnd)
     }
 }

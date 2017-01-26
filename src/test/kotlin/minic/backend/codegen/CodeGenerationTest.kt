@@ -149,6 +149,39 @@ false
     }
 
     @Test
+    fun calculatesEqualityExpressions() {
+        val code = """
+int i1 = 42; int i2 = 43; int i3 = 42;
+double f1 = 42.5; double f2 = 42.0; double f3 = 42.5;
+bool b1 = true; bool b2 = false; bool b3 = true;
+string s1 = "Hello"; string s2 = "not hello"; string s3 = "Hello";
+println(toString( i1 == i1 ) + " " + toString( i1 == i2 ) + " " + toString( i2 == i1 ) + " " + toString( i1 == i3 ) + " " + toString( i3 == i1 ));
+println(toString( i1 != i1 ) + " " + toString( i1 != i2 ) + " " + toString( i2 != i1 ) + " " + toString( i1 != i3 ) + " " + toString( i3 != i1 ));
+println(toString( f1 == f1 ) + " " + toString( f1 == f2 ) + " " + toString( f2 == f1 ) + " " + toString( f1 == f3 ) + " " + toString( f3 == f1 ));
+println(toString( f1 != f1 ) + " " + toString( f1 != f2 ) + " " + toString( f2 != f1 ) + " " + toString( f1 != f3 ) + " " + toString( f3 != f1 ));
+println(toString( b1 == b1 ) + " " + toString( b1 == b2 ) + " " + toString( b2 == b1 ) + " " + toString( b1 == b3 ) + " " + toString( b3 == b1 ));
+println(toString( b1 != b1 ) + " " + toString( b1 != b2 ) + " " + toString( b2 != b1 ) + " " + toString( b1 != b3 ) + " " + toString( b3 != b1 ));
+println(toString( s1 == s1 ) + " " + toString( s1 == s2 ) + " " + toString( s2 == s1 ) + " " + toString( s1 == s3 ) + " " + toString( s3 == s1 ));
+println(toString( s1 != s1 ) + " " + toString( s1 != s2 ) + " " + toString( s2 != s1 ) + " " + toString( s1 != s3 ) + " " + toString( s3 != s1 ));
+println(toString( i1 == f2 ) + " " + toString( f2 == i1 ));
+println(toString( i1 != f2 ) + " " + toString( f2 != i1 ));
+"""
+        val expectedOutput = """
+true false false true true
+false true true false false
+true false false true true
+false true true false false
+true false false true true
+false true true false false
+true false false true true
+false true true false false
+true true
+false false
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
     fun handlesVariables() {
         val code = """
 int a = 0;
