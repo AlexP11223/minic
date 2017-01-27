@@ -44,11 +44,10 @@ fun AstNode.processWithSymbolsUntil(scope: Scope,
         is StatementsBlock -> currentScope = LocalScope(currentScope)
     }
 
-    if (!enterOperation(this, currentScope))
-        return
-
-    children().forEach {
-        it.processWithSymbolsUntil(currentScope, beforeSymbolOperation, enterOperation, exitOperation)
+    if (enterOperation(this, currentScope)) {
+        children().forEach {
+            it.processWithSymbolsUntil(currentScope, beforeSymbolOperation, enterOperation, exitOperation)
+        }
     }
 
     exitOperation(this, currentScope)

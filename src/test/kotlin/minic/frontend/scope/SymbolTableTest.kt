@@ -132,6 +132,7 @@ class SymbolTableTest {
                 "Exit VariableDeclaration: string str",
                 "BeforeSymbol WhileStatement: string str",
                 "Enter WhileStatement: string str",
+                "Exit WhileStatement: string str",
                 "Exit Program: string str"
         ), result)
     }
@@ -162,7 +163,8 @@ class SymbolTableTest {
                 "Enter VariableDeclaration: string str",
                 "Exit VariableDeclaration: string str",
                 "BeforeSymbol WhileStatement: string str",
-                "Enter WhileStatement: string str"
+                "Enter WhileStatement: string str",
+                "Exit WhileStatement: string str"
         ), result)
     }
 
