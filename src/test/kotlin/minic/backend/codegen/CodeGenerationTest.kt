@@ -317,6 +317,33 @@ while (!flag) {
         assertEquals(expectedOutput, compileAndRun(code))
     }
 
+    @Test(timeout = 2000)
+    fun breakStatementWorks() {
+        val code = """
+bool flag = true;
+int c = 0;
+while (true) {
+    c = c + 1;
+    println(toString(c));
+    if (c >= 3)
+        break;
+}
+while (!flag) {
+    while (true) {
+        flag = false;
+        break;
+        println("unreachable");
+    }
+}
+"""
+        val expectedOutput = """
+1
+2
+3
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
     @Test
     fun exitStatementWorks() {
         val code = """

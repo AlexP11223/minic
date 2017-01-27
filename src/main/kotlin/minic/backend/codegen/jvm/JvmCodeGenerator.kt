@@ -13,6 +13,7 @@ import org.objectweb.asm.*
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
 import java.lang.reflect.InvocationTargetException
+import java.util.*
 
 /**
  * @param className Name of produced JVM class. Should be the same as name of .class file,
@@ -24,6 +25,10 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
     private val varIndexMap = mutableMapOf<String, Int>()
 
     private var lastInputFuncType: InputFunction? = null
+
+    private data class LoopData(val endLabel: Label)
+
+    private val loopStack = Stack<LoopData>()
 
     /**
      * JVM bytecode. Can be saved to a .class file, executed, etc.
@@ -140,12 +145,16 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
     private fun writeProgramCode(ast: Program, mv: MethodVisitor) {
         ast.processWithSymbolsUntil(Statement::class.java, enterOperation = { statement, scope ->
             writeStatementCode(statement, scope, mv)
+        }, exitOperation = { statement, scope ->
+            handleStatementEnd(statement, scope)
         })
     }
 
     private fun writeProgramCode(node: Statement, scope: Scope, mv: MethodVisitor) {
         node.processWithSymbolsUntil(scope, Statement::class.java, enterOperation = { statement, scope ->
             writeStatementCode(statement, scope, mv)
+        }, exitOperation = { statement, scope ->
+            handleStatementEnd(statement, scope)
         })
     }
 
@@ -226,12 +235,18 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                 val lblEnd = Label()
                 mv.visitJumpInsn(IFEQ, lblEnd)
 
+                loopStack.push(LoopData(lblEnd))
+
                 writeProgramCode(statement.statement, scope, mv)
 
                 mv.visitJumpInsn(GOTO, lblCondition)
                 mv.visitLabel(lblEnd)
 
                 return false // don't visit children statements, already processed
+            }
+            is BreakStatement -> {
+                val currentLoop = loopStack.peek()
+                mv.visitJumpInsn(GOTO, currentLoop.endLabel)
             }
             is ExitStatement -> {
                 mv.visitInsn(ICONST_0)
@@ -241,6 +256,14 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
             else -> throw UnsupportedOperationException(statement.javaClass.canonicalName)
         }
         return true
+    }
+
+    private fun handleStatementEnd(statement: Statement, scope: Scope) {
+        when (statement) {
+            is WhileStatement -> {
+                loopStack.pop()
+            }
+        }
     }
 
     /**
