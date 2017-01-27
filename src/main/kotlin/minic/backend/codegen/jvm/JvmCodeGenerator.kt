@@ -3,7 +3,7 @@ package minic.backend.codegen.jvm
 import minic.backend.ExecutionRuntimeException
 import minic.frontend.ast.*
 import minic.frontend.scope.Scope
-import minic.frontend.scope.processWithSymbols
+import minic.frontend.scope.processWithSymbolsUntil
 import minic.frontend.type.BoolType
 import minic.frontend.type.DoubleType
 import minic.frontend.type.IntType
@@ -105,7 +105,7 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
     // non-static execute() method with Mini-C program code
     private fun writeProgramExecutionMethod(cv: ClassVisitor) {
         writeMethod(ACC_PUBLIC, "execute", "()V", cv) { mv ->
-            writeProgramCode(mv)
+            writeProgramCode(ast, mv)
 
             mv.visitInsn(RETURN)
         }
@@ -136,59 +136,111 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
         mv.visitEnd()
     }
 
-    private fun writeProgramCode(mv: MethodVisitor) {
-        ast.processWithSymbols(Statement::class.java, exitOperation = { statement, scope ->
-            when (statement) {
-                is VariableDeclaration -> {
-                    // TODO: should be optimized to reuse indexes when left scope
-                    val symbol = scope.resolve(statement.variableName)!!
-                    val index = nextVarIndex
 
-                    varIndexMap[statement.variableName] = index
-
-                    nextVarIndex += when (symbol.type) {
-                        IntType, BoolType, StringType -> 1
-                        DoubleType -> 2
-                        else -> throw UnsupportedOperationException("Declaration of ${symbol.type.name}")
-                    }
-
-                    statement.value.pushAs(symbol.type, scope, mv)
-
-                    when (symbol.type) {
-                        IntType, BoolType -> mv.visitVarInsn(ISTORE, index)
-                        DoubleType -> mv.visitVarInsn(DSTORE, index)
-                        StringType -> mv.visitVarInsn(ASTORE, index)
-                        else -> throw UnsupportedOperationException("Declaration of ${symbol.type.name}")
-                    }
-                }
-                is Assignment -> {
-                    val symbol = scope.resolve(statement.variableName)!!
-                    val index = varIndexMap[statement.variableName]!!
-
-                    statement.value.pushAs(symbol.type, scope, mv)
-
-                    when (symbol.type) {
-                        IntType, BoolType -> mv.visitVarInsn(ISTORE, index)
-                        DoubleType -> mv.visitVarInsn(DSTORE, index)
-                        StringType -> mv.visitVarInsn(ASTORE, index)
-                        else -> throw UnsupportedOperationException(symbol.type.name)
-                    }
-                }
-                is PrintStatement -> {
-                    mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
-                    statement.value.push(scope, mv)
-                    val printFunc = if (statement.newline) "println" else "print"
-                    mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", printFunc, "(Ljava/lang/String;)V", false)
-
-                }
-                is ExitStatement -> {
-                    mv.visitInsn(ICONST_0)
-                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "exit", "(I)V", false)
-                }
-                is StatementsBlock -> { /* no need to do anything, process() already visits all children */ }
-                else -> throw UnsupportedOperationException(statement.javaClass.canonicalName)
-            }
+    private fun writeProgramCode(ast: Program, mv: MethodVisitor) {
+        ast.processWithSymbolsUntil(Statement::class.java, enterOperation = { statement, scope ->
+            writeStatementCode(statement, scope, mv)
         })
+    }
+
+    private fun writeProgramCode(node: Statement, scope: Scope, mv: MethodVisitor) {
+        node.processWithSymbolsUntil(scope, Statement::class.java, enterOperation = { statement, scope ->
+            writeStatementCode(statement, scope, mv)
+        })
+    }
+
+    /**
+     * @return false when children statements should not be visited
+     */
+    private fun writeStatementCode(statement: Statement, scope: Scope, mv: MethodVisitor): Boolean {
+        when (statement) {
+            is VariableDeclaration -> {
+                // TODO: should be optimized to reuse indexes when left scope
+                val symbol = scope.resolve(statement.variableName)!!
+                val index = nextVarIndex
+
+                varIndexMap[statement.variableName] = index
+
+                nextVarIndex += when (symbol.type) {
+                    IntType, BoolType, StringType -> 1
+                    DoubleType -> 2
+                    else -> throw UnsupportedOperationException("Declaration of ${symbol.type.name}")
+                }
+
+                statement.value.pushAs(symbol.type, scope, mv)
+
+                when (symbol.type) {
+                    IntType, BoolType -> mv.visitVarInsn(ISTORE, index)
+                    DoubleType -> mv.visitVarInsn(DSTORE, index)
+                    StringType -> mv.visitVarInsn(ASTORE, index)
+                    else -> throw UnsupportedOperationException("Declaration of ${symbol.type.name}")
+                }
+            }
+            is Assignment -> {
+                val symbol = scope.resolve(statement.variableName)!!
+                val index = varIndexMap[statement.variableName]!!
+
+                statement.value.pushAs(symbol.type, scope, mv)
+
+                when (symbol.type) {
+                    IntType, BoolType -> mv.visitVarInsn(ISTORE, index)
+                    DoubleType -> mv.visitVarInsn(DSTORE, index)
+                    StringType -> mv.visitVarInsn(ASTORE, index)
+                    else -> throw UnsupportedOperationException(symbol.type.name)
+                }
+            }
+            is PrintStatement -> {
+                mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
+                statement.value.push(scope, mv)
+                val printFunc = if (statement.newline) "println" else "print"
+                mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", printFunc, "(Ljava/lang/String;)V", false)
+            }
+            is IfStatement -> {
+                statement.expr.pushAs(BoolType, scope, mv)
+
+                val lblElse = Label()
+                mv.visitJumpInsn(IFEQ, lblElse)
+
+                writeProgramCode(statement.ifBody, scope, mv)
+
+                if (statement.elseBody == null) {
+                    mv.visitLabel(lblElse)
+                } else {
+                    val lblEnd = Label()
+                    mv.visitJumpInsn(GOTO, lblEnd)
+                    mv.visitLabel(lblElse)
+
+                    writeProgramCode(statement.elseBody, scope, mv)
+
+                    mv.visitLabel(lblEnd)
+                }
+
+                return false // don't visit children statements, already processed
+            }
+            is WhileStatement -> {
+                val lblCondition = Label()
+                mv.visitLabel(lblCondition)
+
+                statement.expr.pushAs(BoolType, scope, mv)
+
+                val lblEnd = Label()
+                mv.visitJumpInsn(IFEQ, lblEnd)
+
+                writeProgramCode(statement.statement, scope, mv)
+
+                mv.visitJumpInsn(GOTO, lblCondition)
+                mv.visitLabel(lblEnd)
+
+                return false // don't visit children statements, already processed
+            }
+            is ExitStatement -> {
+                mv.visitInsn(ICONST_0)
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "exit", "(I)V", false)
+            }
+            is StatementsBlock -> { /* no need to do anything, process() already visits all children */ }
+            else -> throw UnsupportedOperationException(statement.javaClass.canonicalName)
+        }
+        return true
     }
 
     /**

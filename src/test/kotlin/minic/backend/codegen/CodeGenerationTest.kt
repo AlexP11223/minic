@@ -220,6 +220,7 @@ false true
     fun handlesVariables() {
         val code = """
 int a = 0;
+if (true)
 {
     double b = 1.0;
     int c = 2;
@@ -266,6 +267,52 @@ hello
 7
 8.0
 true
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
+    fun ifStatementWorks() {
+        val code = """
+bool flag = true;
+if (flag)
+    println("if1");
+if (flag) {
+    println("if2");
+    if (!flag)
+        println("if3");
+    else {
+        println("else1");
+    }
+} else {
+    println("else2");
+}
+"""
+        val expectedOutput = """
+if1
+if2
+else1
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
+    fun whileStatementWorks() {
+        val code = """
+bool flag = true;
+int c = 0;
+while (c < 3) {
+    c = c + 1;
+    println(toString(c));
+}
+while (!flag) {
+    println("unreachable");
+}
+"""
+        val expectedOutput = """
+1
+2
+3
 """.trim()
         assertEquals(expectedOutput, compileAndRun(code))
     }
