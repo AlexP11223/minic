@@ -97,4 +97,73 @@ class SymbolTableTest {
         ), result)
     }
 
+    @Test
+    fun canProcessWithSymbolsUntil() {
+        val ast = Program(listOf(
+                VariableDeclaration(StringTypeNode(), "str", StringLiteral("Hello")),
+                WhileStatement(BooleanLiteral(true),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0))
+                        )))
+        ))
+
+        val result = mutableListOf<String>()
+
+        ast.processWithSymbolsUntil(beforeSymbolOperation = { node, scope ->
+            result.add(("BeforeSymbol " + node.javaClass.simpleName + ": " + symbolsStr(scope)).trim(' ', ':'))
+        }, enterOperation = fun(node, scope): Boolean {
+            result.add(("Enter " + node.javaClass.simpleName + ": " + symbolsStr(scope)).trim(' ', ':'))
+            return node !is WhileStatement
+        }, exitOperation = { node, scope ->
+            result.add(("Exit " + node.javaClass.simpleName + ": " + symbolsStr(scope)).trim(' ', ':'))
+        })
+
+        assertEquals(listOf(
+                "BeforeSymbol Program",
+                "Enter Program",
+                "BeforeSymbol VariableDeclaration",
+                "Enter VariableDeclaration: string str",
+                "BeforeSymbol StringTypeNode: string str",
+                "Enter StringTypeNode: string str",
+                "Exit StringTypeNode: string str",
+                "BeforeSymbol StringLiteral: string str",
+                "Enter StringLiteral: string str",
+                "Exit StringLiteral: string str",
+                "Exit VariableDeclaration: string str",
+                "BeforeSymbol WhileStatement: string str",
+                "Enter WhileStatement: string str",
+                "Exit Program: string str"
+        ), result)
+    }
+
+    @Test
+    fun canProcessSpecificNodeTypeWithSymbolsUntil() {
+        val ast = Program(listOf(
+                VariableDeclaration(StringTypeNode(), "str", StringLiteral("Hello")),
+                WhileStatement(BooleanLiteral(true),
+                        StatementsBlock(listOf(
+                                VariableDeclaration(IntTypeNode(), "i", IntLiteral(0))
+                        )))
+        ))
+
+        val result = mutableListOf<String>()
+
+        ast.processWithSymbolsUntil(Statement::class.java, beforeSymbolOperation = { node, scope ->
+            result.add(("BeforeSymbol " + node.javaClass.simpleName + ": " + symbolsStr(scope)).trim(' ', ':'))
+        }, enterOperation = fun(node, scope): Boolean {
+            result.add(("Enter " + node.javaClass.simpleName + ": " + symbolsStr(scope)).trim(' ', ':'))
+            return node !is WhileStatement
+        }, exitOperation = { node, scope ->
+            result.add(("Exit " + node.javaClass.simpleName + ": " + symbolsStr(scope)).trim(' ', ':'))
+        })
+
+        assertEquals(listOf(
+                "BeforeSymbol VariableDeclaration",
+                "Enter VariableDeclaration: string str",
+                "Exit VariableDeclaration: string str",
+                "BeforeSymbol WhileStatement: string str",
+                "Enter WhileStatement: string str"
+        ), result)
+    }
+
 }
