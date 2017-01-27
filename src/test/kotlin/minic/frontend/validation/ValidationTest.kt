@@ -98,6 +98,12 @@ while (true) {
     }
 }
 f = g + h;
+if (true) {
+    int x = 42;
+}
+if (true) {
+    print(toString(x + 1));
+}
 """.trim()
 
         val expectedErrors = listOf(
@@ -107,7 +113,8 @@ f = g + h;
                 Error("Variable 'e' is not declared", Point(8, 19)),
                 Error("Variable 'f' is not declared", Point(11, 0)),
                 Error("Variable 'g' is not declared", Point(11, 4)),
-                Error("Variable 'h' is not declared", Point(11, 8))
+                Error("Variable 'h' is not declared", Point(11, 8)),
+                Error("Variable 'x' is not declared", Point(16, 19))
         )
 
         assertEquals(expectedErrors, validate(code))

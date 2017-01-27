@@ -127,4 +127,6 @@ data class ReadInt(override val position: Position? = null) : InputFunction
 data class ReadDouble(override val position: Position? = null) : InputFunction
 data class ReadLine(override val position: Position? = null) : InputFunction
 
-data class ToString(val value: Expression, override val position: Position? = null) : Expression
+data class ToString(val value: Expression, override val position: Position? = null) : Expression {
+    override fun children(): List<AstNode> = listOf(value)
+}
