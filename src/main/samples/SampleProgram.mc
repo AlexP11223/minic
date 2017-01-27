@@ -23,10 +23,17 @@ while (i <= n) {
 println("Sum of the first " + toString(n) +
         " natural numbers: " + toString(sum));
 
-println("First 10 prime numbers:");
+double pi = 3.141592;
+int r = 5;
+double area = pi * (r * r);
+println("Area of a circle with radius " + toString(r) + ": " +
+        toString(area));
+
+int desiredCount = 20;
+println("First " + toString(desiredCount) + " prime numbers:");
 int num = 2;
 int count = 0;
-while (count < 10) {
+while (count < desiredCount) {
     bool isPrime = true;
     int j = 1;
     while (j < num / 2) {
@@ -37,8 +44,10 @@ while (count < 10) {
             j = j + 1;
     }
     if (isPrime) {
-        count = count + 1;
         print(toString(num));
+        if (count < desiredCount - 1)
+            print(toString(", "));
+        count = count + 1;
     }
     num = num + 1;
 }
