@@ -363,16 +363,38 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                                     }
                                     else -> throw UnsupportedOperationException(type.name)
                                 }
-                                val lblBeforeFalse = Label()
-                                mv.visitJumpInsn(comparisonOpcode, lblBeforeFalse)
-                                mv.visitInsn(ICONST_1)
-                                val lblEnd = Label()
-                                mv.visitJumpInsn(GOTO, lblEnd)
-                                mv.visitLabel(lblBeforeFalse)
-                                mv.visitInsn(ICONST_0)
-                                mv.visitLabel(lblEnd)
+                                pushComparison(comparisonOpcode, mv)
                             }
                         }
+                    }
+                    is RelationalExpression -> {
+                        left.pushAs(leftType, scope, mv)
+                        right.pushAs(rightType, scope, mv)
+                        val type = leftType
+                        if (type == DoubleType) {
+                            when (this) {
+                                is LessExpression, is LessOrEqualExpression -> mv.visitInsn(DCMPG)
+                                is GreaterExpression, is GreaterOrEqualExpression -> mv.visitInsn(DCMPL)
+                            }
+                        }
+                        val comparisonOpcode = when (type) {
+                            IntType, BoolType -> when (this) {
+                                is LessExpression -> IF_ICMPGE
+                                is GreaterExpression -> IF_ICMPLE
+                                is LessOrEqualExpression -> IF_ICMPGT
+                                is GreaterOrEqualExpression -> IF_ICMPLT
+                                else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
+                            }
+                            DoubleType ->  when (this) {
+                                is LessExpression -> IFGE
+                                is GreaterExpression -> IFLE
+                                is LessOrEqualExpression -> IFGT
+                                is GreaterOrEqualExpression -> IFLT
+                                else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
+                            }
+                            else -> throw UnsupportedOperationException(type.name)
+                        }
+                        pushComparison(comparisonOpcode, mv)
                     }
                     else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
                 }
@@ -397,14 +419,18 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
         }
     }
 
-    private fun pushNot(mv: MethodVisitor) {
+    private fun pushComparison(opcode: Int, mv: MethodVisitor) {
         val lblBeforeFalse = Label()
-        mv.visitJumpInsn(IFNE, lblBeforeFalse)
+        mv.visitJumpInsn(opcode, lblBeforeFalse)
         mv.visitInsn(ICONST_1)
         val lblEnd = Label()
         mv.visitJumpInsn(GOTO, lblEnd)
         mv.visitLabel(lblBeforeFalse)
         mv.visitInsn(ICONST_0)
         mv.visitLabel(lblEnd)
+    }
+
+    private fun pushNot(mv: MethodVisitor) {
+        pushComparison(IFNE, mv)
     }
 }

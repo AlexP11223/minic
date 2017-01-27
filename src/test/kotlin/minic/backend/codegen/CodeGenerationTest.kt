@@ -182,6 +182,41 @@ false false
     }
 
     @Test
+    fun calculatesRelationExpressions() {
+        val code = """
+int i1 = 42; int i2 = 43; int i3 = 42;
+double f1 = 42.5; double f2 = 42.6; double f3 = 42.5;
+println(toString( i1 < i1 ) + " " + toString( i1 < i2 ) + " " + toString( i2 < i1 ) + " " + toString( i1 < i3 ) + " " + toString( i3 < i1 ));
+println(toString( i1 > i1 ) + " " + toString( i1 > i2 ) + " " + toString( i2 > i1 ) + " " + toString( i1 > i3 ) + " " + toString( i3 > i1 ));
+println(toString( i1 <= i1 ) + " " + toString( i1 <= i2 ) + " " + toString( i2 <= i1 ) + " " + toString( i1 <= i3 ) + " " + toString( i3 <= i1 ));
+println(toString( i1 >= i1 ) + " " + toString( i1 >= i2 ) + " " + toString( i2 >= i1 ) + " " + toString( i1 >= i3 ) + " " + toString( i3 >= i1 ));
+println(toString( f1 < f1 ) + " " + toString( f1 < f2 ) + " " + toString( f2 < f1 ) + " " + toString( f1 < f3 ) + " " + toString( f3 < f1 ));
+println(toString( f1 > f1 ) + " " + toString( f1 > f2 ) + " " + toString( f2 > f1 ) + " " + toString( f1 > f3 ) + " " + toString( f3 > f1 ));
+println(toString( f1 <= f1 ) + " " + toString( f1 <= f2 ) + " " + toString( f2 <= f1 ) + " " + toString( f1 <= f3 ) + " " + toString( f3 <= f1 ));
+println(toString( f1 >= f1 ) + " " + toString( f1 >= f2 ) + " " + toString( f2 >= f1 ) + " " + toString( f1 >= f3 ) + " " + toString( f3 >= f1 ));
+println(toString( i1 < f2 ) + " " + toString( f2 < i1 ));
+println(toString( i1 > f2 ) + " " + toString( f2 > i1 ));
+println(toString( i1 <= f2 ) + " " + toString( f2 <= i1 ));
+println(toString( i1 >= f2 ) + " " + toString( f2 >= i1 ));
+"""
+        val expectedOutput = """
+false true false false false
+false false true false false
+true true false true true
+true false true true true
+false true false false false
+false false true false false
+true true false true true
+true false true true true
+true false
+false true
+true false
+false true
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
     fun handlesVariables() {
         val code = """
 int a = 0;
