@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/AlexP11223/minic.svg?branch=master)](https://travis-ci.org/AlexP11223/minic)
+
 A simple compiler for a C-like programming language.
 
 It has if-else statements, loops, variables (of int, double, bool or string types), arithmetic, comparison, logical operations, “functions” for user communications via stdin/stdout.
