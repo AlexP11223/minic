@@ -357,6 +357,27 @@ Hello
         assertEquals(expectedOutput, compileAndRun(code))
     }
 
+    @Test
+    fun allowsEmptyStatements() {
+        val code = """
+;
+;;;
+if (true)
+    ;
+if (false)
+    ;
+else {
+    while (false)
+        ;
+    println("Hello");
+}
+"""
+        val expectedOutput = """
+Hello
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
     @Test(timeout = 2000)
     fun readsInput() {
         val code = """

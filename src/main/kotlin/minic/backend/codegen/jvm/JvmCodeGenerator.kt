@@ -253,6 +253,7 @@ class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", va
                 mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "exit", "(I)V", false)
             }
             is StatementsBlock -> { /* no need to do anything, process() already visits all children */ }
+            is EmptyStatement -> { /* no need to generate anything for empty statements (";") */ }
             else -> throw UnsupportedOperationException(statement.javaClass.canonicalName)
         }
         return true

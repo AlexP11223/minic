@@ -36,6 +36,7 @@ class AntlrToAstMapper(val withPositions: Boolean = true) {
         is AssignmentStatementContext -> Assignment(assignment().Identifier().text, assignment().expression().toAst(), position())
         is PrintStatementContext -> PrintStatement(parExpression().expression().toAst(), newline = false)
         is PrintlnStatementContext -> PrintStatement(parExpression().expression().toAst(), newline = true)
+        is EmptyStatementContext -> EmptyStatement(position())
         else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
     }
 

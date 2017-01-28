@@ -45,6 +45,8 @@ data class PrintStatement(val value: Expression, val newline: Boolean, override 
     override fun children(): List<AstNode> = listOf(value)
 }
 
+data class EmptyStatement(override val position: Position? = null) : Statement
+
 //
 // Types
 //

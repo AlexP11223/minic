@@ -352,6 +352,26 @@ print(toString(x));
     }
 
     @Test
+    fun parsesEmptyStatement() {
+        val code =  """
+;
+;;;
+while (true)
+    ;
+"""
+        val expectedAst = Program(listOf(
+                EmptyStatement(),
+                EmptyStatement(),
+                EmptyStatement(),
+                EmptyStatement(),
+                WhileStatement(BooleanLiteral(true),
+                        EmptyStatement())
+        ))
+
+        assertEquals(expectedAst, ast(code))
+    }
+
+    @Test
     fun parsesWithPosition() {
         val code =
 """x = 42;
