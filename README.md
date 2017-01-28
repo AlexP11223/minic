@@ -12,11 +12,11 @@ Requirements:
 - JDK 8+.
 - Maven 3+.
 
-Run Maven `package` goal. This will download all dependencies, run JUnit tests and build JAR file + .exe and shell script. Check Maven output to see if all tests and build steps are completed successfully.
+Run Maven **package** phase. This will download all dependencies, run JUnit tests and build JAR file + .exe and shell script. Check Maven output to see if all tests and build steps are completed successfully.
 
-(Maven is included in popular Java IDEs such as IntelliJ Idea or Eclipse. You can run it either via your IDE Maven plugin or from command line for separate [Maven installation](https://maven.apache.org/install.html): `mvn package`.)
+(Maven is included in popular Java IDEs such as IntelliJ Idea or Eclipse. You can run it either via your IDE Maven plugin or from command line in separate [Maven installation](https://maven.apache.org/install.html): `mvn package`.)
 
-`dist/` folder will contain JAR file, .exe for Windows and shell script for Linux/MacOS (it simply executes the JAR file via `java`)
+`dist/` folder will contain JAR file, .exe for Windows and shell script for Linux/MacOS (it simply executes the JAR file via `java`), as well as a sample source code file.
  
  Some of the tests launch `java`, using path from `System.getProperty("java.home")`. Fallbacks to `java` (from PATH environment variable) if it is not found.
  
