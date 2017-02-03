@@ -5,6 +5,7 @@ import minic.frontend.antlr.MiniCLexer
 import minic.frontend.antlr.MiniCParser
 import minic.frontend.ast.AntlrToAstMapper
 import minic.frontend.ast.Point
+import minic.frontend.ast.Program
 import minic.frontend.validation.Error
 import minic.frontend.validation.validate
 import org.antlr.v4.runtime.*
@@ -19,17 +20,28 @@ import java.io.InputStream
 data class CompilerConfiguration(val diagnosticChecks: Boolean = false)
 
 class Compiler(input: ANTLRInputStream, val config: CompilerConfiguration = CompilerConfiguration()) {
+    constructor(input: String, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
+    constructor(input: InputStream, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
 
     data class AntlrParsingResult(val root: MiniCParser.ProgramContext, val errors: List<Error>)
 
+    /**
+     * ANTLR tree and errors produced after parsing
+     */
     val parsingResult: AntlrParsingResult
 
     init {
         parsingResult = parse(input)
     }
 
-    constructor(input: String, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
-    constructor(input: InputStream, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
+    /**
+     * AST of the program code
+     * Computed only once on the first access
+     * May throw exception if [parsingResult] has errors
+     */
+    val ast: Program by lazy(LazyThreadSafetyMode.NONE) {
+        AntlrToAstMapper().map(parsingResult.root)
+    }
 
     private fun parse(input: ANTLRInputStream) : AntlrParsingResult {
         val errors = mutableListOf<Error>()
@@ -58,8 +70,6 @@ class Compiler(input: ANTLRInputStream, val config: CompilerConfiguration = Comp
         return AntlrParsingResult(parser.program(), errors)
     }
 
-    private fun ast() = AntlrToAstMapper().map(parsingResult.root)
-
     /**
      * Returns list of errors (syntax or semantic), or empty list if there are no errors
      */
@@ -67,7 +77,7 @@ class Compiler(input: ANTLRInputStream, val config: CompilerConfiguration = Comp
         if (parsingResult.errors.any())
             return parsingResult.errors
 
-        return ast().validate()
+        return ast.validate()
     }
 
     private fun generateJvmBytecode(classNane: String) : JvmCodeGenerator {
@@ -75,7 +85,7 @@ class Compiler(input: ANTLRInputStream, val config: CompilerConfiguration = Comp
         if (errors.any())
             throw Exception(errors.joinToString())
 
-        return JvmCodeGenerator(ast(), classNane, config.diagnosticChecks)
+        return JvmCodeGenerator(ast, classNane, config.diagnosticChecks)
     }
 
     /**
