@@ -1,6 +1,7 @@
 package minic.frontend.ast
 
 import minic.Compiler
+import minic.CompilerConfiguration
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -9,7 +10,7 @@ class AstTest {
     fun pos(startLine: Int, startCol: Int, endLine: Int, endCol: Int) = Position(Point(startLine,startCol), Point(endLine,endCol))
 
     fun ast(code: String, withPositions: Boolean = false, diagnosticChecks: Boolean = true): Program {
-        val parsingResult = Compiler(diagnosticChecks).parse(code)
+        val parsingResult = Compiler(code, CompilerConfiguration(diagnosticChecks)).parsingResult
 
         assertTrue(parsingResult.errors.isEmpty(), "Parsng errors\n" + parsingResult.errors)
 

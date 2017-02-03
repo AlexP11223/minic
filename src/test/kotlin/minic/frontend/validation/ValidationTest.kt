@@ -1,6 +1,7 @@
 package minic.frontend.validation
 
 import minic.Compiler
+import minic.CompilerConfiguration
 import minic.frontend.ast.Point
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -9,7 +10,7 @@ import kotlin.test.assertTrue
 class ValidationTest {
 
     fun validate(code: String, diagnosticChecks: Boolean = true): List<Error> {
-        return Compiler(diagnosticChecks).validate(code)
+        return Compiler(code, CompilerConfiguration(diagnosticChecks)).validate()
     }
 
     @Test

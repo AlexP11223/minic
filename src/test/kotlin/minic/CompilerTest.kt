@@ -16,7 +16,7 @@ class CompilerTest {
     fun producesOutputFile() {
         val outputFilePath = tmpFolder.root.absolutePath + "/Program.class"
 
-        Compiler().compile("", outputFilePath)
+        Compiler(input = "").compile(outputFilePath)
 
         assertTrue(File(outputFilePath).exists(), "$outputFilePath doesn't exist")
         assertTrue(File(outputFilePath).length() > 0, "$outputFilePath is empty")
@@ -24,11 +24,11 @@ class CompilerTest {
 
     @Test
     fun executesWithoutFail() {
-        Compiler().execute("")
+        Compiler(input = "").execute()
     }
 
     @Test(expected = ExecutionRuntimeException::class)
     fun throwsWhenExecutionRuntimeError() {
-        Compiler().execute("int a = 1/0;")
+        Compiler(input = "int a = 1/0;").execute()
     }
 }

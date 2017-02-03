@@ -69,11 +69,9 @@ fun main(args: Array<String>) {
         println()
     }
 
-    val compiler = Compiler()
+    val compiler = Compiler(inputStream)
 
-    val parsingResult = compiler.parse(inputStream)
-
-    val errors = compiler.validate(parsingResult)
+    val errors = compiler.validate()
     if (errors.any()) {
         println("${errors.count()} error${if (errors.count() > 1) "s" else ""}.")
         errors.forEach {
@@ -84,9 +82,9 @@ fun main(args: Array<String>) {
 
     try {
         if (executionMode) {
-            compiler.execute(parsingResult)
+            compiler.execute()
         } else {
-            compiler.compile(parsingResult, outputFilePath!!)
+            compiler.compile(outputFilePath!!)
         }
     } catch (ex: Exception) {
         println("Code generation error")

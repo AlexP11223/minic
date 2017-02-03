@@ -1,6 +1,7 @@
 package minic.backend.codegen
 
 import minic.Compiler
+import minic.CompilerConfiguration
 import minic.JavaTestUtils
 import minic.ProcessTestUtils
 import org.apache.commons.io.FilenameUtils
@@ -22,7 +23,7 @@ class CodeGenerationTest {
     private fun compileAndRun(code: String, input: String? = null): String {
         val outputFilePath = tmpFolder.root.absolutePath + "/Program${System.currentTimeMillis()}_${code.length}.class"
 
-        Compiler(diagnosticChecks = true).compile(code, outputFilePath)
+        Compiler(code, CompilerConfiguration(diagnosticChecks = true)).compile(outputFilePath)
 
         assertTrue(File(outputFilePath).exists(), "$outputFilePath doesn't exist")
         assertTrue(File(outputFilePath).length() > 0, "$outputFilePath is empty")

@@ -16,14 +16,22 @@ import java.io.InputStream
 /**
  * @param diagnosticChecks Enables additional checks during parsing (ambiguity, ...) and code generation (bytecode correctness).
  */
-class Compiler(val diagnosticChecks: Boolean = false) {
+data class CompilerConfiguration(val diagnosticChecks: Boolean = false)
+
+class Compiler(input: ANTLRInputStream, val config: CompilerConfiguration = CompilerConfiguration()) {
 
     data class AntlrParsingResult(val root: MiniCParser.ProgramContext, val errors: List<Error>)
 
-    fun parse(input: String) : AntlrParsingResult = parse(ANTLRInputStream(input))
-    fun parse(input: InputStream) : AntlrParsingResult = parse(ANTLRInputStream(input))
+    val parsingResult: AntlrParsingResult
 
-    fun parse(input: ANTLRInputStream) : AntlrParsingResult {
+    init {
+        parsingResult = parse(input)
+    }
+
+    constructor(input: String, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
+    constructor(input: InputStream, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
+
+    private fun parse(input: ANTLRInputStream) : AntlrParsingResult {
         val errors = mutableListOf<Error>()
 
         val errorListener = object : BaseErrorListener() {
@@ -42,7 +50,7 @@ class Compiler(val diagnosticChecks: Boolean = false) {
         val parser = MiniCParser(tokens)
         parser.removeErrorListeners() // remove ConsoleErrorListener
         parser.addErrorListener(errorListener)
-        if (diagnosticChecks) {
+        if (config.diagnosticChecks) {
             parser.interpreter.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION
             parser.addErrorListener(DiagnosticErrorListener())
         }
@@ -50,54 +58,45 @@ class Compiler(val diagnosticChecks: Boolean = false) {
         return AntlrParsingResult(parser.program(), errors)
     }
 
-    fun validate(input: String) : List<Error> = validate(ANTLRInputStream(input))
-    fun validate(input: InputStream) : List<Error> = validate(ANTLRInputStream(input))
-    fun validate(input: ANTLRInputStream) : List<Error> = validate(parse(input))
+    private fun ast() = AntlrToAstMapper().map(parsingResult.root)
 
     /**
      * Returns list of errors (syntax or semantic), or empty list if there are no errors
      */
-    fun validate(parsingResult: AntlrParsingResult) : List<Error> {
+    fun validate() : List<Error> {
         if (parsingResult.errors.any())
             return parsingResult.errors
 
-        val ast = AntlrToAstMapper().map(parsingResult.root)
-
-        return ast.validate()
+        return ast().validate()
     }
 
-    private fun generateJvmBytecode(parsingResult: AntlrParsingResult, classNane: String) : JvmCodeGenerator {
-        val errors = validate(parsingResult)
+    private fun generateJvmBytecode(classNane: String) : JvmCodeGenerator {
+        val errors = validate()
         if (errors.any())
             throw Exception(errors.joinToString())
 
-        val ast = AntlrToAstMapper().map(parsingResult.root)
-
-        return JvmCodeGenerator(ast, classNane, diagnosticChecks)
+        return JvmCodeGenerator(ast(), classNane, config.diagnosticChecks)
     }
 
-    fun compile(input: String, outputFilePath: String) = compile(ANTLRInputStream(input), outputFilePath)
-    fun compile(input: InputStream, outputFilePath: String) = compile(ANTLRInputStream(input), outputFilePath)
-    fun compile(input: ANTLRInputStream, outputFilePath: String) = compile(parse(input), outputFilePath)
-
-    fun compile(parsingResult: AntlrParsingResult, outputFilePath: String) {
+    /**
+     * Creates file with JVM bytecode
+     * @param outputFilePath Path of the output file with JVM bytecode.
+     * The file name should have .class extension to be able to be executed by java
+     */
+    fun compile(outputFilePath: String) {
         val className = FilenameUtils.removeExtension(FilenameUtils.getName(outputFilePath))
 
-        val  bytes = generateJvmBytecode(parsingResult, className).bytes
+        val  bytes = generateJvmBytecode(className).bytes
 
         FileOutputStream(outputFilePath).use {
             it.write(bytes)
         }
     }
 
-    fun execute(input: String) = execute(ANTLRInputStream(input))
-    fun execute(input: InputStream) = execute(ANTLRInputStream(input))
-    fun execute(input: ANTLRInputStream) = execute(parse(input))
-
     /**
      * Executes program in current thread
      */
-    fun execute(parsingResult: AntlrParsingResult) {
-        generateJvmBytecode(parsingResult, "MinicMain").execute()
+    fun execute() {
+        generateJvmBytecode("MinicMain").execute()
     }
 }
