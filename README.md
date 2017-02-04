@@ -1,3 +1,4 @@
+#Mini-C compiler
 [![Build Status](https://travis-ci.org/AlexP11223/minic.svg?branch=master)](https://travis-ci.org/AlexP11223/minic)
 
 A simple compiler for a C-like programming language.
