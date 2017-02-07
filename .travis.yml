@@ -1,6 +1,10 @@
 language: java
-jdk:
-  - oraclejdk8
+matrix:
+  include:
+    - os: linux
+      jdk: oraclejdk8
+    - os: osx
+      osx_image: xcode8.2
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y lib32z1 lib32ncurses5 # launch4j apparently needs this
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y lib32z1 lib32ncurses5 ; fi # launch4j apparently needs this
