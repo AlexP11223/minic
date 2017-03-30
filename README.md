@@ -1,4 +1,5 @@
-#Mini-C compiler
+# Mini-C compiler
+
 [![Build Status](https://travis-ci.org/AlexP11223/minic.svg?branch=master)](https://travis-ci.org/AlexP11223/minic)
 
 A simple compiler for a C-like programming language.
@@ -7,7 +8,7 @@ It has if-else statements, loops, variables (of int, double, bool or string type
 
 Implemented in Kotlin, using ANTLR for parsing and ASM library for JVM bytecode output.
 
-#How to build
+# How to build
 
 Requirements:
 - JDK 8+.
@@ -21,7 +22,7 @@ Run Maven **package** phase. This will download all dependencies, run JUnit test
  
  Some of the tests launch `java`, using path from `System.getProperty("java.home")`. Fallbacks to `java` (from PATH environment variable) if it is not found.
  
-#Usage
+# Usage
  
  1. `cd dist/minic-dist`
  2. Run `minic  <parameters>` (via shell script or Windows .exe) or `java -jar minic.jar <parameters>`.
