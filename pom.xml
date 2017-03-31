@@ -8,6 +8,27 @@
     <artifactId>minic</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <name>Mini-C compiler</name>
+    <description>A simple compiler for a C-like programming language to JVM bytecode implemented in Kotlin.
+        Created for educational purposes and for usage in another educational app
+        (visualization/simulation of compilation process).</description>
+    <url>https://github.com/AlexP11223/minic</url>
+
+    <developers>
+        <developer>
+            <name>Alex P</name>
+            <email>alex.pantec@gmail.com</email>
+            <organization>-</organization>
+            <organizationUrl>https://github.com/AlexP11223</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/AlexP11223/minic.git</connection>
+        <developerConnection>scm:git:ssh://github.com:AlexP11223/minic.git</developerConnection>
+        <url>https://github.com/AlexP11223/minic</url>
+    </scm>
+
     <properties>
         <kotlin.version>1.1.1</kotlin.version>
 
