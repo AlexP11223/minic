@@ -20,7 +20,7 @@ import java.util.*
  *                  does not matter if not saved to a file to be executed by java.
  * @param diagnosticChecks Enables additional checks during code generation (bytecode correctness).
  */
-class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", val diagnosticChecks: Boolean = false) {
+internal class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", val diagnosticChecks: Boolean = false) {
     private var nextVarIndex = 1
     private val varIndexMap = mutableMapOf<String, Int>()
 

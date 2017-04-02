@@ -11,7 +11,7 @@ fun Token.endPoint() = Point(line, charPositionInLine + (if (type != MiniCLexer.
 /**
  * @param withPositions if false, sets all nodes positions to null (used to simplify tests)
  */
-class AntlrToAstMapper(val withPositions: Boolean = true) {
+internal class AntlrToAstMapper(val withPositions: Boolean = true) {
 
     /**
      * Maps ANTLR parse to AST
