@@ -40,6 +40,8 @@ fun main(args: Array<String>) {
 
     val outputTokens = args.contains("--tokens")
 
+    val drawAst = args.contains("--draw-ast")
+
     if (args.count() > 0) {
         if (args.any { listOf("help", "--help", "-help", "-h", "--h").contains(it) }) {
             showUsage()
@@ -105,5 +107,9 @@ fun main(args: Array<String>) {
         compiler.tokens.forEach {
             println("${it.name}: ${it.text}")
         }
+    }
+
+    if (drawAst) {
+        compiler.drawAst("ast.png")
     }
 }

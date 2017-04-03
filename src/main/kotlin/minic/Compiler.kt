@@ -1,6 +1,7 @@
 package minic
 
 import minic.backend.codegen.jvm.JvmCodeGenerator
+import minic.backend.info.tree.AstGraphvizRenderer
 import minic.frontend.antlr.MiniCLexer
 import minic.frontend.antlr.MiniCParser
 import minic.frontend.ast.AntlrToAstMapper
@@ -12,8 +13,11 @@ import minic.frontend.validation.validate
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.atn.PredictionMode
 import org.apache.commons.io.FilenameUtils
+import java.awt.image.BufferedImage
+import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import javax.imageio.ImageIO
 
 /**
  * @param diagnosticChecks Enables additional checks during parsing (ambiguity, ...) and code generation (bytecode correctness).
@@ -127,5 +131,19 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
      */
     fun execute() {
         generateJvmBytecode("MinicMain").execute()
+    }
+
+    /**
+     * Renders AST to an image
+     */
+    fun drawAst() : BufferedImage {
+        return AstGraphvizRenderer(ast).render()
+    }
+
+    /**
+     * Renders AST to an image and saves it to the specified file (PNG)
+     */
+    fun drawAst(outputFilePath: String) {
+        ImageIO.write(drawAst(), "png", File(outputFilePath))
     }
 }
