@@ -3,11 +3,10 @@ package minic.frontend.antlr
 import com.tngtech.java.junit.dataprovider.DataProvider
 import com.tngtech.java.junit.dataprovider.DataProviderRunner
 import com.tngtech.java.junit.dataprovider.UseDataProvider
-import org.antlr.v4.runtime.ANTLRInputStream
+import minic.Compiler
+import minic.frontend.lexer.Token
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.StringReader
-import java.util.*
 import kotlin.test.assertEquals
 
 @RunWith(DataProviderRunner::class)
@@ -79,21 +78,42 @@ while (true) {
     }
 
     fun tokens(code: String) : List<String> {
-        val lexer = MiniCLexer(ANTLRInputStream(StringReader(code)))
-        val tokens = ArrayList<String>()
-        do {
-            val t = lexer.nextToken()
-            when (t.type) {
-                -1 -> tokens.add("EOF")
-                else -> tokens.add(MiniCLexer.VOCABULARY.getSymbolicName(t.type))
-            }
-        } while (t.type != -1)
-        return tokens
+        return Compiler(code).tokens.map { it.name }
     }
 
     @Test
     @UseDataProvider("tokensDataProvider")
     fun producesCorrectTokens(expectedTokens: List<String>, code: String) {
         assertEquals(expectedTokens, tokens(code))
+    }
+
+    @Test
+    fun producesCorrectTokensProperties() {
+        val code = """
+int myVar = 42;
+print(toString(myVar));
+""".trim()
+        val tokens = Compiler(code).tokens;
+        assertEquals(listOf(
+                Token(0, 2, 1, "int", "INT_TYPE"),
+                Token(4, 8, 1, "myVar", "Identifier"),
+                Token(10, 10, 1, "=", "ASSIGN"),
+                Token(12, 13, 1, "42", "IntegerLiteral"),
+                Token(14, 14, 1, ";", "SEMI"),
+                Token(16, 20, 2, "print", "PRINT_KEYWORD"),
+                Token(21, 21, 2, "(", "LPAR"),
+                Token(22, 29, 2, "toString", "TO_STRING_KEYWORD"),
+                Token(30, 30, 2, "(", "LPAR"),
+                Token(31, 35, 2, "myVar", "Identifier"),
+                Token(36, 36, 2, ")", "RPAR"),
+                Token(37, 37, 2, ")", "RPAR"),
+                Token(38, 38, 2, ";", "SEMI"),
+                Token(39, 38, 2, "<EOF>", "EOF")
+        ), tokens)
+
+        assertEquals(3, tokens[0].length)
+        assertEquals(5, tokens[1].length)
+        assertEquals(1, tokens[2].length)
+        assertEquals(0, tokens.last().length)
     }
 }

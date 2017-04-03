@@ -6,6 +6,7 @@ import minic.frontend.antlr.MiniCParser
 import minic.frontend.ast.AntlrToAstMapper
 import minic.frontend.ast.Point
 import minic.frontend.ast.Program
+import minic.frontend.lexer.Token
 import minic.frontend.validation.Error
 import minic.frontend.validation.validate
 import org.antlr.v4.runtime.*
@@ -41,6 +42,24 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
      */
     val ast: Program by lazy(LazyThreadSafetyMode.NONE) {
         AntlrToAstMapper().map(parsingResult.root)
+    }
+
+    /**
+     * Tokens recognized by lexer
+     */
+    val tokens: List<Token> by lazy {
+        input.reset()
+        val lexer = MiniCLexer(input)
+        val tokensList = ArrayList<Token>()
+        do {
+            val t = lexer.nextToken()
+            val name = when (t.type) {
+                -1 -> "EOF"
+                else -> MiniCLexer.VOCABULARY.getSymbolicName(t.type)
+            }
+            tokensList.add(Token(t.startIndex, t.stopIndex, t.line, t.text, name))
+        } while (t.type != -1)
+        tokensList
     }
 
     private fun parse(input: ANTLRInputStream) : AntlrParsingResult {
