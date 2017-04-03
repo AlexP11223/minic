@@ -5,8 +5,8 @@ import minic.frontend.antlr.MiniCParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 
-fun Token.startPoint() = Point(line, charPositionInLine)
-fun Token.endPoint() = Point(line, charPositionInLine + (if (type != MiniCLexer.EOF) text.length else 0))
+internal fun Token.startPoint() = Point(line, charPositionInLine)
+internal fun Token.endPoint() = Point(line, charPositionInLine + (if (type != MiniCLexer.EOF) text.length else 0))
 
 /**
  * @param withPositions if false, sets all nodes positions to null (used to simplify tests)

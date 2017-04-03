@@ -19,11 +19,11 @@ import java.io.InputStream
  */
 data class CompilerConfiguration(val diagnosticChecks: Boolean = false)
 
-class Compiler(input: ANTLRInputStream, val config: CompilerConfiguration = CompilerConfiguration()) {
+class Compiler internal constructor(private val input: ANTLRInputStream, val config: CompilerConfiguration = CompilerConfiguration()) {
     constructor(input: String, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
     constructor(input: InputStream, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
 
-    data class AntlrParsingResult(val root: MiniCParser.ProgramContext, val errors: List<Error>)
+    data class AntlrParsingResult(internal val root: MiniCParser.ProgramContext, val errors: List<Error>)
 
     /**
      * ANTLR tree and errors produced after parsing
