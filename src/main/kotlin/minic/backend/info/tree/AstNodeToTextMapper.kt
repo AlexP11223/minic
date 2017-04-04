@@ -8,7 +8,7 @@ internal fun AstNode.toText() : String = when (this) {
     is IfStatement -> "if"
     is WhileStatement -> "while"
     is BreakStatement -> "break"
-    is PrintStatement -> "print"
+    is PrintStatement -> "print" + if (newline) "ln" else ""
     is ExitStatement -> "exit"
     is EmptyStatement -> "<empty>"
     is StatementsBlock -> "{ } block"
