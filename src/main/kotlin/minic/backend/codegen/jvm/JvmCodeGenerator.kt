@@ -399,16 +399,39 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
                             }
                         }
                     }
-                    // TODO: implement logical and/or instead of bitwise
                     is AndExpression -> {
                         left.pushAs(BoolType, scope, mv)
+                        val lblFalse = Label()
+                        mv.visitJumpInsn(IFEQ, lblFalse)
+
                         right.pushAs(BoolType, scope, mv)
-                        mv.visitInsn(IAND)
+                        mv.visitJumpInsn(IFEQ, lblFalse)
+
+                        mv.visitLdcInsn(1)
+                        val lblEnd = Label()
+                        mv.visitJumpInsn(GOTO, lblEnd)
+
+                        mv.visitLabel(lblFalse)
+                        mv.visitLdcInsn(0)
+                        mv.visitLabel(lblEnd)
                     }
                     is OrExpression -> {
                         left.pushAs(BoolType, scope, mv)
+                        val lblTrue = Label()
+                        mv.visitJumpInsn(IFNE, lblTrue)
+
                         right.pushAs(BoolType, scope, mv)
-                        mv.visitInsn(IOR)
+                        val lblFalse = Label()
+                        mv.visitJumpInsn(IFEQ, lblFalse)
+
+                        mv.visitLabel(lblTrue)
+                        mv.visitLdcInsn(1)
+                        val lblEnd = Label()
+                        mv.visitJumpInsn(GOTO, lblEnd)
+
+                        mv.visitLabel(lblFalse)
+                        mv.visitLdcInsn(0)
+                        mv.visitLabel(lblEnd)
                     }
                     is EqualityExpression -> {
                         left.pushAs(leftType, scope, mv)

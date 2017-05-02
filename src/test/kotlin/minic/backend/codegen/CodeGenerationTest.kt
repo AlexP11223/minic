@@ -150,6 +150,27 @@ false
     }
 
     @Test
+    fun doesNotUseBitwiseAndOr() {
+        val code = """
+bool a = true;
+int x = 0;
+if (x != 0 && 42 / x > 0)
+    println("0");
+if (a || 42 / x > 0)
+    println("1");
+if (a && x != 0 && 42 / x > 0)
+    println("0");
+if (!a || x == 0 || 42 / x > 0)
+    println("2");
+"""
+        val expectedOutput = """
+1
+2
+""".trim()
+        assertEquals(expectedOutput, compileAndRun(code))
+    }
+
+    @Test
     fun calculatesEqualityExpressions() {
         val code = """
 int i1 = 42; int i2 = 43; int i3 = 42;
