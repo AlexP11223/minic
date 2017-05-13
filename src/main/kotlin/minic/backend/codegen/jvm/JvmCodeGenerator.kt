@@ -111,8 +111,6 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
     private fun writeProgramExecutionMethod(cv: ClassVisitor) {
         writeMethod(ACC_PUBLIC, "execute", "()V", cv) { mv ->
             writeProgramCode(ast, mv)
-
-            mv.visitInsn(RETURN)
         }
     }
 
