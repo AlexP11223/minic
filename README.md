@@ -32,12 +32,22 @@ If launched without parameters, it reads input from stdin until EOF (Ctrl+D, or 
 Also it is possible to specify input and output files: 
 
 ```
-minic input_file [output_file]
+minic [input_file [output_file]] [options]
 ```
 
 **input_file** is path (or name) of file with Mini-C source code.
 
 **output_file** is path (or name) of output file with JVM bytecode. Optional. If not specified, _input_file_ without extension will be used. **.class** extension is appended if not present (otherwise `java` will not run it), such as MyProgram.class.
+
+Options:
+
+**--ast** [png_output_file]: draw AST and save as PNG image (default ast.png).
+
+**--tokens**: output lexer tokens.
+
+**--bytecode**: output bytecode as text. Only the main code, not the whole generated class. Also not includes frames map.
+
+**--decompiled_bytecode**: The same as *--bytecode* but extracts bytecode from generated result instead of writing it during codegen, and includes frames map.
 
 Example:
 
@@ -51,4 +61,10 @@ minic MyProgram.mc MyProgram
 and
 ```
 java MyProgram
+```
+
+Additional output:
+
+```
+minic MyProgram.mc --ast my_ast.png --tokens --bytecode --decompiled_bytecode
 ```
