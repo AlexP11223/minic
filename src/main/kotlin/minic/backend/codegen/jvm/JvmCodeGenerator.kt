@@ -1,6 +1,7 @@
 package minic.backend.codegen.jvm
 
 import minic.backend.ExecutionRuntimeException
+import minic.backend.codegen.jvm.info.BytecodeTextifierVisitor
 import minic.frontend.ast.*
 import minic.frontend.scope.Scope
 import minic.frontend.scope.processWithSymbolsUntil
@@ -12,8 +13,12 @@ import minic.frontend.type.Type
 import org.objectweb.asm.*
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
+import java.io.ByteArrayOutputStream
+import java.io.PrintWriter
 import java.lang.reflect.InvocationTargetException
 import java.util.*
+import java.nio.charset.StandardCharsets
+
 
 /**
  * @param className Name of produced JVM class. Should be the same as name of .class file,
@@ -60,14 +65,23 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
         }
     }
 
-    private fun compile(): ByteArray {
+    fun bytecodeText(): String {
+        val baos = ByteArrayOutputStream()
+        val pw = PrintWriter(baos)
+
+        compile(pw)
+
+        return String(baos.toByteArray(), StandardCharsets.UTF_8)
+    }
+
+    private fun compile(bytecodeTextWriter: PrintWriter? = null): ByteArray {
         val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
         val cv = if (diagnosticChecks) CheckClassAdapter(classWriter, true) else classWriter
         cv.visit(V1_8, ACC_PUBLIC, className, null, "java/lang/Object", null)
 
         writeInitMethod(cv)
 
-        writeProgramExecutionMethod(cv)
+        writeProgramExecutionMethod(if (bytecodeTextWriter == null) cv else BytecodeTextifierVisitor(cv, bytecodeTextWriter))
 
         writeMainMethod(cv)
 
@@ -126,6 +140,7 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
 
     private fun writeMethod(access: Int, name: String, desc: String, cv: ClassVisitor, writeCode: (mv: MethodVisitor) -> Unit) {
         val mv = cv.visitMethod(access, name, desc, null, null)
+
         mv.visitCode()
 
         writeCode(mv)

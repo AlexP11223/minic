@@ -129,7 +129,7 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
     /**
      * Executes program in current thread
      */
-    fun execute() {
+    fun execute(input: String? = null) {
         generateJvmBytecode("MinicMain").execute()
     }
 
@@ -145,5 +145,9 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
      */
     fun drawAst(outputFilePath: String) {
         ImageIO.write(drawAst(), "png", File(outputFilePath))
+    }
+
+    fun bytecodeText(): String {
+        return generateJvmBytecode("MinicMain").bytecodeText()
     }
 }

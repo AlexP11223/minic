@@ -1,6 +1,8 @@
 package minic
 
 import minic.backend.ExecutionRuntimeException
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -30,5 +32,20 @@ class CompilerTest {
     @Test(expected = ExecutionRuntimeException::class)
     fun throwsWhenExecutionRuntimeError() {
         Compiler(input = "int a = 1/0;").execute()
+    }
+
+    @Test
+    fun generatesBytecodeText() {
+        val code = """
+int x = 42;
+x = x + 1;
+""".trim()
+        val result = Compiler(input = code).bytecodeText()
+
+        assertThat(result, containsString("LDC 42"))
+        assertThat(result, containsString("ISTORE"))
+        assertThat(result, containsString("ILOAD"))
+        assertThat(result, containsString("LDC 1"))
+        assertThat(result, containsString("IADD"))
     }
 }

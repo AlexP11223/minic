@@ -108,15 +108,15 @@ class AppTest {
     }
 
     @Test
-    fun compilesAndShowsTokensAst() {
+    fun compilesAndShowsTokensAstBytecode() {
         val inputFilePath = tmpFolder.root.absolutePath + "/Program.mc"
         val astOutputFilePath = tmpFolder.root.absolutePath + "/ast.png"
 
         FileUtils.writeStringToFile(File(inputFilePath), "int x = 42;\n int y = x*2;", Charset.defaultCharset())
 
         val argsCombinations = listOf(
-                arrayOf(inputFilePath, "--tokens", "--ast", astOutputFilePath),
-                arrayOf(inputFilePath, "--ast", astOutputFilePath, "--tokens")
+                arrayOf(inputFilePath, "--tokens", "--bytecode", "--ast", astOutputFilePath),
+                arrayOf(inputFilePath, "--ast", astOutputFilePath, "--tokens", "--bytecode")
         )
 
         argsCombinations.forEach { args ->
@@ -129,6 +129,10 @@ class AppTest {
             assertThat(output, containsString("ASSIGN"))
             assertThat(output, containsString("MUL"))
 
+            assertThat(output, containsString("Bytecode:"))
+            assertThat(output, containsString("ISTORE"))
+            assertThat(output, containsString("IMUL"))
+
             assertTrue(File(astOutputFilePath).exists(), "$astOutputFilePath doesn't exist")
             assertTrue(File(astOutputFilePath).length() > 0, "$astOutputFilePath is empty")
 
@@ -137,10 +141,10 @@ class AppTest {
     }
 
     @Test
-    fun executesAndShowsTokensAst() {
+    fun executesAndShowsTokensAstBytecode() {
         val astOutputFilePath = tmpFolder.root.absolutePath + "/ast.png"
 
-        run(arrayOf("--tokens", "--ast", astOutputFilePath), "int x = 42;\n int y = x*2;")
+        run(arrayOf("--tokens", "--bytecode", "--ast", astOutputFilePath), "int x = 42;\n int y = x*2;")
 
         assertTrue(errorOutput.isEmpty(), errorOutput)
 
@@ -148,6 +152,10 @@ class AppTest {
         assertThat(output, containsString("INT_TYPE"))
         assertThat(output, containsString("ASSIGN"))
         assertThat(output, containsString("MUL"))
+
+        assertThat(output, containsString("Bytecode:"))
+        assertThat(output, containsString("ISTORE"))
+        assertThat(output, containsString("IMUL"))
 
         assertTrue(File(astOutputFilePath).exists(), "$astOutputFilePath doesn't exist")
         assertTrue(File(astOutputFilePath).length() > 0, "$astOutputFilePath is empty")
