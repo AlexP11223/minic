@@ -18,13 +18,17 @@ internal class App(val out: PrintStream = System.out,
     private val helpOption: OptionSpec<Void>
     private val astOption: OptionSpec<String>
     private val bytecodeOption: OptionSpec<Void>
+    private val decompiledBytecodeOption: OptionSpec<Void>
     private val tokensOption: OptionSpec<Void>
 
     init {
+        val newline = System.lineSeparator() + "        "
+
         helpOption = optionParser.acceptsAll(arrayListOf("h", "help", "?"), "Show help").forHelp()
         astOption = optionParser.accepts("ast", "Draw AST and save as PNG image (default ast.png)")
                 .withOptionalArg().defaultsTo("ast.png").describedAs("png_output_file")
-        bytecodeOption = optionParser.accepts("bytecode", "Output bytecode as text (only the main code, not the whole generated class)")
+        bytecodeOption = optionParser.accepts("bytecode", "Output bytecode as text (only the main code, not the whole${newline}generated class, and without frames map)")
+        decompiledBytecodeOption = optionParser.accepts("decompiled_bytecode", "The same as --bytecode but extracts bytecode from generated result${newline}instead of writing it during codegen, includes frames map")
         tokensOption = optionParser.accepts("tokens", "Output lexer tokens")
     }
 
@@ -114,6 +118,11 @@ internal class App(val out: PrintStream = System.out,
             out.println(compiler.bytecodeText())
         }
 
+        if (options.has(decompiledBytecodeOption)) {
+            out.println("Decompiled bytecode:")
+            out.println(compiler.decompileBytecodeText())
+        }
+
         if (options.has(astOption)) {
             val astOutputFilePath = astOption.value(options)
             compiler.drawAst(astOutputFilePath)
@@ -161,9 +170,10 @@ until EOF (Ctrl+D, or Ctrl+Z for Windows), compiles and runs the program.""")
         err.println("""Examples:
     $compilerName MyProgram.mc
     $compilerName MyProgram.mc MyProgram
+    $compilerName MyProgram.mc --tokens
     $compilerName MyProgram.mc --ast myast.png
     $compilerName MyProgram.mc --bytecode
-    $compilerName MyProgram.mc --tokens""")
+    $compilerName MyProgram.mc --decompiled_bytecode""")
     }
 
 

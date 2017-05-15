@@ -115,8 +115,8 @@ class AppTest {
         FileUtils.writeStringToFile(File(inputFilePath), "int x = 42;\n int y = x*2;", Charset.defaultCharset())
 
         val argsCombinations = listOf(
-                arrayOf(inputFilePath, "--tokens", "--bytecode", "--ast", astOutputFilePath),
-                arrayOf(inputFilePath, "--ast", astOutputFilePath, "--tokens", "--bytecode")
+                arrayOf(inputFilePath, "--tokens", "--bytecode", "--decompiled_bytecode", "--ast", astOutputFilePath),
+                arrayOf(inputFilePath, "--ast", astOutputFilePath, "--tokens", "--bytecode", "--decompiled_bytecode")
         )
 
         argsCombinations.forEach { args ->
@@ -133,6 +133,8 @@ class AppTest {
             assertThat(output, containsString("ISTORE"))
             assertThat(output, containsString("IMUL"))
 
+            assertThat(output, containsString("Decompiled bytecode:"))
+
             assertTrue(File(astOutputFilePath).exists(), "$astOutputFilePath doesn't exist")
             assertTrue(File(astOutputFilePath).length() > 0, "$astOutputFilePath is empty")
 
@@ -144,7 +146,7 @@ class AppTest {
     fun executesAndShowsTokensAstBytecode() {
         val astOutputFilePath = tmpFolder.root.absolutePath + "/ast.png"
 
-        run(arrayOf("--tokens", "--bytecode", "--ast", astOutputFilePath), "int x = 42;\n int y = x*2;")
+        run(arrayOf("--tokens", "--bytecode", "--decompiled_bytecode", "--ast", astOutputFilePath), "int x = 42;\n int y = x*2;")
 
         assertTrue(errorOutput.isEmpty(), errorOutput)
 
@@ -156,6 +158,8 @@ class AppTest {
         assertThat(output, containsString("Bytecode:"))
         assertThat(output, containsString("ISTORE"))
         assertThat(output, containsString("IMUL"))
+
+        assertThat(output, containsString("Decompiled bytecode:"))
 
         assertTrue(File(astOutputFilePath).exists(), "$astOutputFilePath doesn't exist")
         assertTrue(File(astOutputFilePath).length() > 0, "$astOutputFilePath is empty")

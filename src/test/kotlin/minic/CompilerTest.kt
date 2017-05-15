@@ -2,6 +2,7 @@ package minic
 
 import minic.backend.ExecutionRuntimeException
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +39,10 @@ class CompilerTest {
     fun generatesBytecodeText() {
         val code = """
 int x = 42;
-x = x + 1;
+if (x > 0)
+    x = x + 1;
+else
+    x = x - 1;
 """.trim()
         val result = Compiler(input = code).bytecodeText()
 
@@ -47,5 +51,25 @@ x = x + 1;
         assertThat(result, containsString("ILOAD"))
         assertThat(result, containsString("LDC 1"))
         assertThat(result, containsString("IADD"))
+        assertThat(result, not(containsString("FRAME")))
+    }
+
+    @Test
+    fun decompilesBytecodeText() {
+        val code = """
+int x = 42;
+if (x > 0)
+    x = x + 1;
+else
+    x = x - 1;
+""".trim()
+        val result = Compiler(input = code).decompileBytecodeText()
+
+        assertThat(result, containsString("LDC 42"))
+        assertThat(result, containsString("ISTORE"))
+        assertThat(result, containsString("ILOAD"))
+        assertThat(result, containsString("LDC 1"))
+        assertThat(result, containsString("IADD"))
+        assertThat(result, containsString("FRAME"))
     }
 }

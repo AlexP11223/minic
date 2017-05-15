@@ -1,6 +1,7 @@
 package minic
 
 import minic.backend.codegen.jvm.JvmCodeGenerator
+import minic.backend.codegen.jvm.info.BytecodeDecompiler
 import minic.backend.info.tree.AstGraphvizRenderer
 import minic.frontend.antlr.MiniCLexer
 import minic.frontend.antlr.MiniCParser
@@ -149,5 +150,13 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
 
     fun bytecodeText(): String {
         return generateJvmBytecode("MinicMain").bytecodeText()
+    }
+
+    fun decompileBytecodeText(): String {
+        return decompileBytecodeText(generateJvmBytecode("MinicMain").bytes)
+    }
+
+    fun decompileBytecodeText(classBytes: ByteArray): String {
+        return BytecodeDecompiler(classBytes).methodText("execute", showFrames = true)
     }
 }
