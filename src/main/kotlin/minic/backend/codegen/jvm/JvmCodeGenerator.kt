@@ -75,6 +75,8 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
     }
 
     private fun compile(bytecodeTextWriter: PrintWriter? = null): ByteArray {
+        nextVarIndex = 1
+
         val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
         val cv = if (diagnosticChecks) CheckClassAdapter(classWriter, true) else classWriter
         cv.visit(V1_8, ACC_PUBLIC, className, null, "java/lang/Object", null)
