@@ -104,12 +104,12 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
         return ast.validate()
     }
 
-    private fun generateJvmBytecode(classNane: String) : JvmCodeGenerator {
+    private fun generateJvmBytecode(className: String) : JvmCodeGenerator {
         val errors = validate()
         if (errors.any())
             throw Exception(errors.joinToString())
 
-        return JvmCodeGenerator(ast, classNane, config.diagnosticChecks)
+        return JvmCodeGenerator(ast, className, config.diagnosticChecks)
     }
 
     /**
