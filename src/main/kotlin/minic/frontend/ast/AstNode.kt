@@ -20,6 +20,7 @@ interface AstNode {
         exitOperation(this)
     }
 
+    @Suppress("UNCHECKED_CAST")
     /**
      * The same as [process] but calls operations only if node is instance of the specified nodeClass
      * @param nodeClass any class with AstNode interface

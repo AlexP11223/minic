@@ -130,7 +130,7 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
     /**
      * Executes program in current thread
      */
-    fun execute(input: String? = null) {
+    fun execute() {
         generateJvmBytecode("MinicMain").execute()
     }
 

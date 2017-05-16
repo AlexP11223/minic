@@ -274,7 +274,7 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
         return true
     }
 
-    private fun handleStatementEnd(statement: Statement, scope: Scope) {
+    private fun handleStatementEnd(statement: Statement, @Suppress("UNUSED_PARAMETER") scope: Scope) {
         when (statement) {
             is WhileStatement -> {
                 loopStack.pop()

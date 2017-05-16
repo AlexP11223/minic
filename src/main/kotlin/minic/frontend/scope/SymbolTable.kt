@@ -61,7 +61,8 @@ fun Program.processWithSymbolsUntil(beforeSymbolOperation: (AstNode, Scope) -> U
                                exitOperation: (AstNode, Scope) -> Unit = ::emptyOp)
         = this.processWithSymbolsUntil(GlobalScope(), beforeSymbolOperation, enterOperation, exitOperation)
 
-/**
+@Suppress("UNCHECKED_CAST")
+        /**
  * The same as [processWithSymbolsUntil] but calls operations only if node is instance of the specified nodeClass
  */
 fun <T: AstNode> AstNode.processWithSymbolsUntil(scope: Scope, nodeClass: Class<T>,
@@ -94,7 +95,8 @@ fun <T: AstNode> Program.processWithSymbolsUntil(nodeClass: Class<T>,
                                             exitOperation: (T, Scope) -> Unit = ::emptyOp)
         = this.processWithSymbolsUntil(GlobalScope(), nodeClass, beforeSymbolOperation, enterOperation, exitOperation)
 
-/**
+@Suppress("UNCHECKED_CAST")
+        /**
  * The same as [processWithSymbols] but calls operations only if node is instance of the specified nodeClass
  */
 fun <T: AstNode> AstNode.processWithSymbols(scope: Scope, nodeClass: Class<T>,
@@ -125,5 +127,7 @@ fun <T: AstNode> Program.processWithSymbols(nodeClass: Class<T>,
                                             exitOperation: (T, Scope) -> Unit = ::emptyOp)
         = this.processWithSymbols(GlobalScope(), nodeClass, beforeSymbolOperation, enterOperation, exitOperation)
 
+@Suppress("UNUSED_PARAMETER")
 private fun emptyOp(node: AstNode, scope: Scope) { }
+@Suppress("UNUSED_PARAMETER")
 private fun emptyOpBool(node: AstNode, scope: Scope): Boolean { return true }
