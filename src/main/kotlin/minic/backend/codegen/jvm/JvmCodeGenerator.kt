@@ -24,8 +24,10 @@ import java.nio.charset.StandardCharsets
  * @param className Name of produced JVM class. Should be the same as name of .class file,
  *                  does not matter if not saved to a file to be executed by java.
  * @param diagnosticChecks Enables additional checks during code generation (bytecode correctness).
+ * @param debugInfo Adds additional information, such as source code line numbers in bytecode
  */
-internal class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain", val diagnosticChecks: Boolean = false) {
+internal class JvmCodeGenerator(val ast: Program, val className: String = "MinicMain",
+                                val diagnosticChecks: Boolean = false, val debugInfo: Boolean = false) {
     private var nextVarIndex = 1
     private val varIndexMap = mutableMapOf<String, Int>()
 
@@ -34,6 +36,8 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
     private data class LoopData(val endLabel: Label)
 
     private val loopStack = Stack<LoopData>()
+
+    private var lastLineNumber: Int = -1
 
     /**
      * JVM bytecode. Can be saved to a .class file, executed, etc.
@@ -175,6 +179,16 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
      * @return false when children statements should not be visited
      */
     private fun writeStatementCode(statement: Statement, scope: Scope, mv: MethodVisitor): Boolean {
+        if (debugInfo) {
+            val line = statement.position!!.start.line
+            if (lastLineNumber < line) {
+                lastLineNumber = line
+                val label = Label()
+                mv.visitLabel(label)
+                mv.visitLineNumber(line, label)
+            }
+        }
+
         when (statement) {
             is VariableDeclaration -> {
                 // TODO: should be optimized to reuse indexes when left scope

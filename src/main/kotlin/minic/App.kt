@@ -20,6 +20,7 @@ internal class App(val out: PrintStream = System.out,
     private val bytecodeOption: OptionSpec<Void>
     private val decompiledBytecodeOption: OptionSpec<Void>
     private val tokensOption: OptionSpec<Void>
+    private val debugOption: OptionSpec<Void>
 
     init {
         val newline = System.lineSeparator() + "        "
@@ -28,6 +29,7 @@ internal class App(val out: PrintStream = System.out,
         astOption = optionParser.accepts("ast", "Draw AST and save as PNG image (default ast.png)")
                 .withOptionalArg().defaultsTo("ast.png").describedAs("png_output_file")
         bytecodeOption = optionParser.accepts("bytecode", "Output bytecode as text (only the main code, not the whole${newline}generated class, and without frames map)")
+        debugOption = optionParser.acceptsAll(arrayListOf("d", "debug"), "Adds additional information, such as source code line numbers in bytecode")
         decompiledBytecodeOption = optionParser.accepts("decompiled_bytecode", "The same as --bytecode but extracts bytecode from generated result${newline}instead of writing it during codegen, includes frames map")
         tokensOption = optionParser.accepts("tokens", "Output lexer tokens")
     }
@@ -82,7 +84,7 @@ internal class App(val out: PrintStream = System.out,
             out.println()
         }
 
-        val compiler = Compiler(inputStream)
+        val compiler = Compiler(inputStream, CompilerConfiguration(debugInfo = options.has(debugOption)))
 
         val errors = compiler.validate()
         if (errors.any()) {
@@ -173,7 +175,8 @@ until EOF (Ctrl+D, or Ctrl+Z for Windows), compiles and runs the program.""")
     $compilerName MyProgram.mc --tokens
     $compilerName MyProgram.mc --ast myast.png
     $compilerName MyProgram.mc --bytecode
-    $compilerName MyProgram.mc --decompiled_bytecode""")
+    $compilerName MyProgram.mc --decompiled_bytecode
+    $compilerName MyProgram.mc --bytecode --debug""")
     }
 
 

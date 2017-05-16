@@ -166,6 +166,42 @@ class AppTest {
     }
 
     @Test
+    fun compilesInDebugModeAndShowsLineNumbers() {
+        val inputFilePath = tmpFolder.root.absolutePath + "/Program.mc"
+
+        FileUtils.writeStringToFile(File(inputFilePath), "int x = 42;\n int y = x*2;", Charset.defaultCharset())
+
+        val argsCombinations = listOf(
+                arrayOf(inputFilePath, "--debug", "--bytecode"),
+                arrayOf(inputFilePath, "-d", "--bytecode")
+        )
+
+        argsCombinations.forEach { args ->
+            run(args)
+
+            assertTrue(errorOutput.isEmpty(), errorOutput)
+
+            assertThat(output, containsString("LINENUMBER"))
+        }
+    }
+
+    @Test
+    fun executesInDebugModeAndShowsLineNumbers() {
+        val argsCombinations = listOf(
+                arrayOf("--debug", "--bytecode"),
+                arrayOf("-d", "--bytecode")
+        )
+
+        argsCombinations.forEach { args ->
+            run(args, "int x = 42;\n int y = x*2;")
+
+            assertTrue(errorOutput.isEmpty(), errorOutput)
+
+            assertThat(output, containsString("LINENUMBER"))
+        }
+    }
+
+    @Test
     fun showsCompilationErrors() {
         val inputFilePath = tmpFolder.root.absolutePath + "/Program.mc"
         val outputFilePath = tmpFolder.root.absolutePath + "/Program.class"

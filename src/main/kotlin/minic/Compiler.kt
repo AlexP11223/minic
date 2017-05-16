@@ -22,8 +22,9 @@ import javax.imageio.ImageIO
 
 /**
  * @param diagnosticChecks Enables additional checks during parsing (ambiguity, ...) and code generation (bytecode correctness).
+ * @param debugInfo Adds additional information, such as source code line numbers in bytecode
  */
-data class CompilerConfiguration(val diagnosticChecks: Boolean = false)
+data class CompilerConfiguration(val diagnosticChecks: Boolean = false, val debugInfo: Boolean = false)
 
 class Compiler internal constructor(private val input: ANTLRInputStream, val config: CompilerConfiguration = CompilerConfiguration()) {
     constructor(input: String, config: CompilerConfiguration = CompilerConfiguration()) : this(ANTLRInputStream(input), config)
@@ -109,7 +110,7 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
         if (errors.any())
             throw Exception(errors.joinToString())
 
-        return JvmCodeGenerator(ast, className, config.diagnosticChecks)
+        return JvmCodeGenerator(ast, className, diagnosticChecks = config.diagnosticChecks, debugInfo = config.debugInfo)
     }
 
     /**

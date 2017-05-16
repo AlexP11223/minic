@@ -47,6 +47,8 @@ Options:
 
 **--bytecode**: output bytecode as text. Only the main code, not the whole generated class. Also not includes frames map.
 
+**--debug**, **-d**: adds additional information, such as source code line numbers in bytecode.
+
 **--decompiled_bytecode**: The same as *--bytecode* but extracts bytecode from generated result instead of writing it during codegen, and includes frames map.
 
 Example:
@@ -67,4 +69,8 @@ Additional output:
 
 ```
 minic MyProgram.mc --ast my_ast.png --tokens --bytecode --decompiled_bytecode
+```
+
+```
+minic MyProgram.mc --bytecode --debug
 ```
