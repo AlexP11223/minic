@@ -40,8 +40,15 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
      */
     val bytes: ByteArray
 
+    val bytecodeText: String
+
     init {
-        bytes = compile()
+        // TODO: refactor to generate text only if needed?
+        val bytecodeTextBaos = ByteArrayOutputStream()
+
+        bytes = compile(PrintWriter(bytecodeTextBaos))
+
+        bytecodeText = String(bytecodeTextBaos.toByteArray(), StandardCharsets.UTF_8)
     }
 
     /**
@@ -65,17 +72,8 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
         }
     }
 
-    fun bytecodeText(): String {
-        val baos = ByteArrayOutputStream()
-        val pw = PrintWriter(baos)
-
-        compile(pw)
-
-        return String(baos.toByteArray(), StandardCharsets.UTF_8)
-    }
-
     private fun compile(bytecodeTextWriter: PrintWriter? = null): ByteArray {
-        nextVarIndex = 1
+        assert(nextVarIndex == 1, { "compile() called more than once" })
 
         val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
         val cv = if (diagnosticChecks) CheckClassAdapter(classWriter, true) else classWriter

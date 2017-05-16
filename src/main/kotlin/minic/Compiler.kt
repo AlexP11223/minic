@@ -149,7 +149,7 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
     }
 
     fun bytecodeText(): String {
-        return generateJvmBytecode("MinicMain").bytecodeText()
+        return generateJvmBytecode("MinicMain").bytecodeText
     }
 
     fun decompileBytecodeText(): String {
