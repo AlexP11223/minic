@@ -376,7 +376,9 @@ while (true)
     fun parsesWithPosition() {
         val code =
 """x = 42;
-int y = 1.5 + x;"""
+int y = 1.5 + x;
+print("hi");
+println("");"""
         val expectedAst = Program(listOf(
                 Assignment("x", IntLiteral(42, pos(1, 4, 1, 6)), pos(1, 0, 1, 7)),
                 VariableDeclaration(IntTypeNode(pos(2, 0, 2, 3)), "y",
@@ -384,8 +386,16 @@ int y = 1.5 + x;"""
                                 FloatLiteral(1.5, pos(2, 8, 2, 11)),
                                 VariableReference("x", pos(2, 14, 2, 15)),
                                 pos(2, 8, 2, 15)
-                        ), pos(2, 0, 2, 16))
-        ), pos(1, 0, 2, 16))
+                        ), pos(2, 0, 2, 16)),
+                PrintStatement(
+                        StringLiteral("hi", pos(3, 6, 3, 10)),
+                        newline = false, position = pos(3, 0, 3, 12)
+                ),
+                PrintStatement(
+                        StringLiteral("", pos(4, 8, 4, 10)),
+                        newline = true, position = pos(4, 0, 4, 12)
+                )
+        ), pos(1, 0, 4, 12))
 
         val ast = ast(code, withPositions = true)
         assertEquals(expectedAst, ast)
