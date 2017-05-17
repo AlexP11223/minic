@@ -294,6 +294,53 @@ true
     }
 
     @Test
+    fun reusesVariablesSpace() {
+        // if diagnosticChecks is set to true, then CheckClassAdapter will throw exception when
+        // exceeded fixed stack/locals size (100)
+        // without checks the size is computed automatically
+
+        val code = """
+${(271..301).map { "int i$it = $it;"  }.joinToString("\n")}
+if (true) {
+    ${(1..50).map { "int j$it = $it;"  }.joinToString("\n")}
+    ${(1..50).map { "println(toString(j$it));"  }.joinToString("\n")}
+}
+if (true) {
+    ${(51..80).map { "double r$it = $it;"  }.joinToString("\n")}
+    ${(51..80).map { "println(toString(r$it));"  }.joinToString("\n")}
+}
+if (true) {
+    ${(111..120).map { "int k$it = $it;"  }.joinToString("\n")}
+    if (true) {
+        ${(81..110).map { "int u$it = $it;"  }.joinToString("\n")}
+        ${(81..110).map { "println(toString(u$it));"  }.joinToString("\n")}
+    }
+    ${(111..120).map { "println(toString(k$it));"  }.joinToString("\n")}
+}
+if (true) {
+    ${(121..170).map { "int y$it = $it;"  }.joinToString("\n")}
+    ${(121..170).map { "println(toString(y$it));"  }.joinToString("\n")}
+}
+if (true) {
+    ${(171..220).map { "int x$it = $it;"  }.joinToString("\n")}
+    ${(171..220).map { "println(toString(x$it));"  }.joinToString("\n")}
+}
+if (true) {
+    ${(221..270).map { "int x$it = $it;"  }.joinToString("\n")}
+    ${(221..270).map { "println(toString(x$it));"  }.joinToString("\n")}
+}
+${(271..301).map { "println(toString(i$it));"  }.joinToString("\n")}
+""".trim()
+        val expectedOutput = """
+${(1..50).joinToString("\n")}
+${(51..80).map { "$it.0" }.joinToString("\n")}
+${(81..301).joinToString("\n")}
+""".trim()
+        val output = compileAndRun(code)
+        assertEquals(expectedOutput, output)
+    }
+
+    @Test
     fun ifStatementWorks() {
         val code = """
 bool flag = true;

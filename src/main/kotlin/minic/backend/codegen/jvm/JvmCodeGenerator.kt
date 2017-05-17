@@ -4,6 +4,7 @@ import minic.backend.ExecutionRuntimeException
 import minic.backend.codegen.jvm.info.BytecodeTextifierVisitor
 import minic.frontend.ast.*
 import minic.frontend.scope.Scope
+import minic.frontend.scope.Symbol
 import minic.frontend.scope.processWithSymbolsUntil
 import minic.frontend.type.BoolType
 import minic.frontend.type.DoubleType
@@ -191,17 +192,12 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
 
         when (statement) {
             is VariableDeclaration -> {
-                // TODO: should be optimized to reuse indexes when left scope
                 val symbol = scope.resolve(statement.variableName)!!
                 val index = nextVarIndex
 
                 varIndexMap[statement.variableName] = index
 
-                nextVarIndex += when (symbol.type) {
-                    IntType, BoolType, StringType -> 1
-                    DoubleType -> 2
-                    else -> throw UnsupportedOperationException("Declaration of ${symbol.type.name}")
-                }
+                nextVarIndex += symbol.jvmVariableSize()
 
                 statement.value.pushAs(symbol.type, scope, mv)
 
@@ -286,10 +282,15 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
         return true
     }
 
-    private fun handleStatementEnd(statement: Statement, @Suppress("UNUSED_PARAMETER") scope: Scope) {
+    private fun handleStatementEnd(statement: Statement, scope: Scope) {
         when (statement) {
             is WhileStatement -> {
                 loopStack.pop()
+            }
+            is StatementsBlock -> {
+                nextVarIndex -= scope.symbols().map { it.jvmVariableSize() }.sum()
+
+                assert(nextVarIndex > 0)
             }
         }
     }
@@ -558,5 +559,11 @@ internal class JvmCodeGenerator(val ast: Program, val className: String = "Minic
 
     private fun pushNot(mv: MethodVisitor) {
         pushComparison(IFNE, mv)
+    }
+
+    private fun Symbol.jvmVariableSize() = when (type) {
+        IntType, BoolType, StringType -> 1
+        DoubleType -> 2
+        else -> throw UnsupportedOperationException("Declaration of ${type.name}")
     }
 }
