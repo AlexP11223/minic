@@ -88,6 +88,57 @@ while (true) {
     }
 
     @Test
+    fun skipsLineComments() {
+        val code = """
+// hello
+int myVar = 42; // comment
+//int myVar = 43;
+/// comment // comment
+string myVar = "Hello comment //";
+""".trim()
+        val tokens = tokens(code);
+        assertEquals(listOf(
+                "INT_TYPE",
+                "Identifier",
+                "ASSIGN",
+                "IntegerLiteral",
+                "SEMI",
+                "STRING_TYPE",
+                "Identifier",
+                "ASSIGN",
+                "StringLiteral",
+                "SEMI",
+                "EOF"), tokens)
+    }
+
+    @Test
+    fun skipsBlockComments() {
+        val code = """
+/* hello */
+/** hello */
+int myVar = 42; /* comment
+comment
+*/
+/*int myVar = 43;/*
+/* /* comment // /* comment */
+string myVar = "Hello comment /*";
+""".trim()
+        val tokens = tokens(code);
+        assertEquals(listOf(
+                "INT_TYPE",
+                "Identifier",
+                "ASSIGN",
+                "IntegerLiteral",
+                "SEMI",
+                "STRING_TYPE",
+                "Identifier",
+                "ASSIGN",
+                "StringLiteral",
+                "SEMI",
+                "EOF"), tokens)
+    }
+
+    @Test
     fun producesCorrectTokensProperties() {
         val code = """
 int myVar = 42;

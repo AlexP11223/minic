@@ -84,6 +84,12 @@ fragment HEX : [0-9a-fA-F] ;
 WS  :  [ \t\r\n\u000C]+ -> skip
     ;
 
+BLOCK_COMMENT : '/*' .*? '*/' -> skip
+              ;
+
+LINE_COMMENT : '//' ~[\r\n]* -> skip
+             ;
+
 // tokens, needed to be able to be able to reference them via constants
 
 IF_KEYWORD: 'if';
