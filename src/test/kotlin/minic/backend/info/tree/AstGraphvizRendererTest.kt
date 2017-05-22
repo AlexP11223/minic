@@ -1,15 +1,14 @@
 package minic.backend.info.tree
 
 import minic.Compiler
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.awt.image.BufferedImage.TYPE_INT_ARGB
 import java.io.File
-import javax.imageio.ImageIO
+import kotlin.concurrent.thread
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AstGraphvizRendererTest {
@@ -36,11 +35,27 @@ print(toString(myVar));
 int myVar = 42;
 print(toString(myVar));
 """
-        val filePath = tmpFolder.root.absolutePath + "/ast.png";
+        val filePath = tmpFolder.root.absolutePath + "/ast.png"
 
         Compiler(code).drawAst(filePath)
 
         assertTrue(File(filePath).exists())
         assertTrue(File(filePath).length() > 1000)
+    }
+
+    @Test
+    fun canRunFromDifferentThreads() {
+        for (i in 1..2) {
+            var ex: Throwable? = null
+            val t = thread(start = false) {
+                rendersImage()
+            }
+            t.setUncaughtExceptionHandler { _, e ->
+                ex = e
+            }
+            t.start()
+            t.join()
+            assertNull(ex, ex.toString())
+        }
     }
 }
