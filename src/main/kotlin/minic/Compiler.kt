@@ -3,6 +3,7 @@ package minic
 import minic.backend.codegen.jvm.JvmCodeGenerator
 import minic.backend.codegen.jvm.info.BytecodeDecompiler
 import minic.backend.info.tree.AstGraphvizRenderer
+import minic.backend.info.tree.TreePainter
 import minic.frontend.antlr.MiniCLexer
 import minic.frontend.antlr.MiniCParser
 import minic.frontend.ast.AntlrToAstMapper
@@ -138,15 +139,15 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
     /**
      * Renders AST to an image
      */
-    fun drawAst() : BufferedImage {
-        return AstGraphvizRenderer(ast).render()
+    fun drawAst(painter: TreePainter? = null) : BufferedImage {
+        return AstGraphvizRenderer(ast, painter).render()
     }
 
     /**
      * Renders AST to an image and saves it to the specified file (PNG)
      */
-    fun drawAst(outputFilePath: String) {
-        ImageIO.write(drawAst(), "png", File(outputFilePath))
+    fun drawAst(outputFilePath: String, painter: TreePainter? = null) {
+        ImageIO.write(drawAst(painter), "png", File(outputFilePath))
     }
 
     fun bytecodeText(): String {

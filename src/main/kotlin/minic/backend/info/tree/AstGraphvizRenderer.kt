@@ -1,5 +1,8 @@
 package minic.backend.info.tree
 
+import guru.nidi.graphviz.attribute.Attribute
+import guru.nidi.graphviz.attribute.Color
+import guru.nidi.graphviz.attribute.Style
 import guru.nidi.graphviz.engine.Format
 import guru.nidi.graphviz.engine.Graphviz
 import guru.nidi.graphviz.model.Factory.graph
@@ -13,7 +16,7 @@ import java.awt.image.BufferedImage
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 
-internal class AstGraphvizRenderer(val ast: Program) {
+internal class AstGraphvizRenderer(val ast: Program, val painter: TreePainter? = null) {
 
     companion object {
 
@@ -86,6 +89,22 @@ internal class AstGraphvizRenderer(val ast: Program) {
         val nodeText = this.toText()
         return node(nodeCounter++.toString())
                 .with(Label.of(nodeText))
+                .painted(painter?.paintNode(this))
                 .link(*children().map { it.toGraphNode() }.toTypedArray())
+    }
+
+    private fun Node.painted(style: NodeStyle?) : Node {
+        if (style == null) {
+            return this
+        }
+
+        val attributes = mutableListOf<Attribute>()
+
+        if (style.fillColor != null) {
+            attributes.add(Style.FILLED)
+            attributes.add(Color.rgb(style.fillColor.toRgbString()).fill())
+        }
+
+        return this.with(*attributes.toTypedArray())
     }
 }
