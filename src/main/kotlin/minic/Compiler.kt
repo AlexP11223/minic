@@ -140,6 +140,9 @@ class Compiler internal constructor(private val input: ANTLRInputStream, val con
      * Renders AST to an image
      */
     fun drawAst(painter: TreePainter? = null) : BufferedImage {
+        if (parsingResult.errors.any())
+            throw Exception(parsingResult.errors.joinToString())
+
         return AstGraphvizRenderer(ast, painter).render()
     }
 

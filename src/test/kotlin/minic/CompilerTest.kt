@@ -36,6 +36,11 @@ class CompilerTest {
         Compiler(input = "int a = 1/0;").execute()
     }
 
+    @Test(expected = Exception::class)
+    fun throwsWhenDrawingAstForInvalidCode() {
+        Compiler(input = "hhh").drawAst()
+    }
+
     @Test
     fun generatesBytecodeText() {
         val code = """
