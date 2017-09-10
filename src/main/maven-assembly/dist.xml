@@ -14,8 +14,9 @@
             <outputDirectory>.</outputDirectory>
         </file>
         <file>
-            <source>${project.build.directory}/minic.jar</source>
+            <source>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</source>
             <outputDirectory>.</outputDirectory>
+            <destName>minic.jar</destName>
         </file>
         <file>
             <source>${project.build.directory}/minic.exe</source>

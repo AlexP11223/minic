@@ -191,6 +191,8 @@
                                 </transformer>
                             </transformers>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>fat</shadedClassifierName>
                         </configuration>
                     </execution>
                 </executions>
@@ -211,7 +213,7 @@
                         <configuration>
                             <headerType>console</headerType>
                             <outfile>${project.basedir}/target/${project.build.finalName}.exe</outfile>
-                            <jar>${project.basedir}/target/${project.build.finalName}.jar</jar>
+                            <jar>${project.basedir}/target/${project.artifactId}-${project.version}-fat.jar</jar>
                             <dontWrapJar>false</dontWrapJar>
                             <errTitle>${project.build.finalName}</errTitle>
                             <classPath>
