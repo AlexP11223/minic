@@ -28,7 +28,13 @@ class CodeGenerationTest {
         assertTrue(File(outputFilePath).exists(), "$outputFilePath doesn't exist")
         assertTrue(File(outputFilePath).length() > 0, "$outputFilePath is empty")
 
-        return run(outputFilePath, input)
+        val output = run(outputFilePath, input)
+        val filteredOutput = output
+                .split('\n')
+                .filter { !it.startsWith("Picked up _") }
+                .joinToString("\n")
+                .replace(Regex("Picked up _.+$"), "") // when no println at the end
+        return filteredOutput
     }
 
     @Test
