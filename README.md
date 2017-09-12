@@ -1,6 +1,7 @@
 # Mini-C compiler
 
 [![Build Status](https://travis-ci.org/AlexP11223/minic.svg?branch=master)](https://travis-ci.org/AlexP11223/minic)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.alexp11223/minic/badge.svg)](https://mvnrepository.com/artifact/com.github.alexp11223/minic)
 
 A simple compiler for a C-like programming language.
 
